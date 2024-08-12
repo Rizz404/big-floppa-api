@@ -6,9 +6,14 @@
   "scripts": {
     "build": "swc src --out-dir dist",
     "start": "node dist/index.js",
-    "dev": "nodemon --watch src --ext ts --exec",
+    "dev": "nodemon --watch src --ext ts --exec ts-node -r tsconfig-paths/register src/index.ts",
     "typeorm": "typeorm-ts-node-commonjs",
-    "migration": " npm run typeorm migration:run -- -d ./src/data-source.ts"
+    "migration:run": "npm run typeorm migration:run -- -d ./src/data-source.ts",
+    "migration:revert": "npm run typeorm migration:revert -- -d ./src/data-source.ts",
+    "schema:sync": "npm run typeorm schema:sync -- -d ./src/data-source.ts",
+    "migration:show": "npm run typeorm migration:show -- -d ./src/data-source.ts",
+    "migration:generate": "npm run typeorm migration:generate -- -d ./src/data-source.ts",
+    "migration:create": "npm run typeorm migration:create "
   },
   "keywords": [],
   "author": "",
@@ -31,6 +36,7 @@
   "devDependencies": {
     "@swc/cli": "^0.3.12",
     "@swc/core": "^1.5.25",
+    "@types/bcrypt": "^5.0.2",
     "@types/body-parser": "^1.19.5",
     "@types/cookie-parser": "^1.4.7",
     "@types/cors": "^2.8.17",
@@ -42,6 +48,7 @@
     "concurrently": "^8.2.2",
     "nodemon": "^3.1.3",
     "ts-node": "^10.9.2",
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "tsconfig-paths": "^4.2.0"
   }
 }

@@ -7,6 +7,7 @@ import morgan from "morgan";
 import "dotenv/config";
 import "reflect-metadata";
 import myDataSource from "./data-source";
+import { userRouter } from "./routes/user.route";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -21,6 +22,7 @@ app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
 app.use(morgan("dev"));
 
 // * Routes
+app.use("/users", userRouter);
 
 // * Server
 myDataSource
