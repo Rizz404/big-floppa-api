@@ -1,12 +1,14 @@
 import {
   Column,
   CreateDateColumn,
+  Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
 import { Cat } from "./Cat.entity";
 
+@Entity()
 export class CatPicture {
   @PrimaryGeneratedColumn("uuid")
   id: string;

@@ -1,6 +1,7 @@
 import {
   Column,
   CreateDateColumn,
+  Entity,
   Index,
   JoinTable,
   ManyToMany,
@@ -14,6 +15,7 @@ import { User } from "./User.entity";
 import { CatPicture } from "./CatPicture.entity";
 import { CatRace } from "./CatRace.entity";
 
+@Entity()
 export class Cat {
   @PrimaryGeneratedColumn("uuid")
   id: string;

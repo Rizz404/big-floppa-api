@@ -1,6 +1,7 @@
 import {
   Column,
   CreateDateColumn,
+  Entity,
   Index,
   ManyToOne,
   PrimaryGeneratedColumn,
@@ -8,6 +9,7 @@ import {
 } from "typeorm";
 import { User } from "./User.entity";
 
+@Entity()
 export class CatRace {
   @PrimaryGeneratedColumn("uuid")
   id: string;
