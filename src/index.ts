@@ -8,6 +8,8 @@ import "dotenv/config";
 import "reflect-metadata";
 import myDataSource from "./data-source";
 import { userRouter } from "./routes/user.route";
+import { catRouter } from "./routes/cat.route";
+import { catRaceRouter } from "./routes/catRace.route";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -23,6 +25,8 @@ app.use(morgan("dev"));
 
 // * Routes
 app.use("/users", userRouter);
+app.use("/cats", catRouter);
+app.use("/cat-race", catRaceRouter);
 
 // * Server
 myDataSource

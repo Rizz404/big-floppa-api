@@ -9,6 +9,7 @@ import {
 } from "typeorm";
 import { User } from "./User.entity";
 
+// ! Ganti jadi Breed ya kali race lu kira orang
 @Entity()
 export class CatRace {
   @PrimaryGeneratedColumn("uuid")

@@ -18,25 +18,25 @@ export class Profile {
   id: string;
 
   // * Defaultnya varchar
-  @Column({ length: 50 })
+  @Column({ nullable: true, length: 50 })
   firstname?: string;
 
-  @Column({ length: 50 })
+  @Column({ nullable: true, length: 50 })
   lastname?: string;
 
-  @Column()
+  @Column({ nullable: true })
   profilePicture?: string;
 
   @Column({ type: "enum", enum: Gender })
-  gender?: string;
+  gender?: Gender;
 
-  @Column({ type: "smallint" })
+  @Column({ nullable: true, type: "smallint" })
   age?: number;
 
-  @Column({ length: 20 })
+  @Column({ nullable: true, length: 20 })
   phoneNumber?: string;
 
-  @Column({ type: "text" })
+  @Column({ nullable: true, type: "text" })
   bio?: string;
 
   @CreateDateColumn()

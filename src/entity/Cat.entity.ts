@@ -21,7 +21,7 @@ export class Cat {
   id: string;
 
   @Index()
-  @Column()
+  @Column({ nullable: true })
   name?: string;
 
   @Column({ type: "smallint" })

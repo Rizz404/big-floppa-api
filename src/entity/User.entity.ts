@@ -27,14 +27,14 @@ export class User {
 
   // * Kalau ada index dan true bersamaan usahakan di decorator saja
   @Index({ unique: true })
-  @Column({ type: "varchar", length: 50 })
+  @Column({ length: 50 })
   username: string;
 
   @Column({ type: "varchar" })
   email: string;
 
-  @Column({ type: "varchar", length: 255 })
-  password: string;
+  @Column({ nullable: true, length: 255 })
+  password?: string;
 
   @Column({ type: "enum", enum: UserRole, default: UserRole.USER })
   role: UserRole;
@@ -42,7 +42,7 @@ export class User {
   @Column({ default: false })
   isOauth: boolean;
 
-  @Column()
+  @Column({ nullable: true })
   lastLogin?: Date;
 
   @Column({ default: false })
