@@ -11,7 +11,8 @@ import {
 } from "typeorm";
 import { Profile } from "./Profile.entity";
 import { Cat } from "./Cat.entity";
-import { CatRace } from "./CatRace.entity";
+import { CatBreed } from "./CatBreed.entity";
+import { UserAddress } from "./UserAddress.entity";
 
 // * Urutannya migration:generate terus migration:run terus migration:create
 
@@ -54,6 +55,9 @@ export class User {
   @UpdateDateColumn()
   updatedAt: Date;
 
+  @OneToMany(() => UserAddress, (userAddres) => userAddres.user)
+  userAddreses: UserAddress[];
+
   // * Relasi one to one begini
   @OneToOne(() => Profile)
   @JoinColumn()
@@ -62,6 +66,6 @@ export class User {
   @OneToMany(() => Cat, (cat) => cat.user)
   cats: Cat[];
 
-  @OneToMany(() => CatRace, (catRace) => catRace.author)
-  catRaces: CatRace[];
+  @OneToMany(() => CatBreed, (catRace) => catRace.author)
+  catRaces: CatBreed[];
 }

@@ -4,14 +4,16 @@ import {
   Entity,
   Index,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
 import { User } from "./User.entity";
+import { Cat } from "./Cat.entity";
 
 // ! Ganti jadi Breed ya kali race lu kira orang
 @Entity()
-export class CatRace {
+export class CatBreed {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
@@ -32,4 +34,6 @@ export class CatRace {
   author: User;
 
   // * many to many cat races dan cat itu hanya ada di cat
+  @OneToMany(() => Cat, (cat) => cat.catBreed)
+  cats: Cat[];
 }

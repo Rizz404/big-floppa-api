@@ -9,7 +9,12 @@ import "reflect-metadata";
 import myDataSource from "./data-source";
 import { userRouter } from "./routes/user.route";
 import { catRouter } from "./routes/cat.route";
-import { catRaceRouter } from "./routes/catRace.route";
+import { catBreedRouter } from "./routes/catBreed.route";
+import { countryRouter } from "./routes/country.route";
+import { provinceRouter } from "./routes/province.route";
+import { cityRouter } from "./routes/City.route";
+import { districtRouter } from "./routes/district.route";
+import { villageRouter } from "./routes/village.route";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -26,7 +31,12 @@ app.use(morgan("dev"));
 // * Routes
 app.use("/users", userRouter);
 app.use("/cats", catRouter);
-app.use("/cat-race", catRaceRouter);
+app.use("/cat-race", catBreedRouter);
+app.use("/countries", countryRouter);
+app.use("/provinces", provinceRouter);
+app.use("/cities", cityRouter);
+app.use("/districts", districtRouter);
+app.use("/village", villageRouter);
 
 // * Server
 myDataSource

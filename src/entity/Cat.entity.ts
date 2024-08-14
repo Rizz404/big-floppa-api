@@ -13,7 +13,7 @@ import {
 import { Gender } from "./Profile.entity";
 import { User } from "./User.entity";
 import { CatPicture } from "./CatPicture.entity";
-import { CatRace } from "./CatRace.entity";
+import { CatBreed } from "./CatBreed.entity";
 
 @Entity()
 export class Cat {
@@ -45,7 +45,6 @@ export class Cat {
   @OneToMany(() => CatPicture, (catPicture) => catPicture.cat)
   catPictures: CatPicture[];
 
-  @ManyToMany(() => CatRace)
-  @JoinTable()
-  catRaces: CatRace[];
+  @ManyToOne(() => CatBreed, (catBreed) => catBreed.cats)
+  catBreed: CatBreed;
 }
