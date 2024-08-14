@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import myDataSource from "@/data-source";
 import { District } from "@/entity/District.entity";
 
-export class DistrictController {
+class DistrictController {
   private districtRepostory = myDataSource.getRepository(District);
 
   public async createDistrict(req: Request, res: Response) {
@@ -83,3 +83,5 @@ export class DistrictController {
     }
   }
 }
+
+export default new DistrictController();

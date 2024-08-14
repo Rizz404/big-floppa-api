@@ -4,6 +4,8 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import helmet from "helmet";
 import morgan from "morgan";
+import session from "express-session";
+import passport from "passport";
 import "dotenv/config";
 import "reflect-metadata";
 import myDataSource from "./data-source";
@@ -12,9 +14,11 @@ import { catRouter } from "./routes/cat.route";
 import { catBreedRouter } from "./routes/catBreed.route";
 import { countryRouter } from "./routes/country.route";
 import { provinceRouter } from "./routes/province.route";
-import { cityRouter } from "./routes/City.route";
+import { cityRouter } from "./routes/city.route";
 import { districtRouter } from "./routes/district.route";
 import { villageRouter } from "./routes/village.route";
+import jwtStrategy from "./strategies/jwt.strategy";
+import { authRouter } from "./routes/auth.route";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -24,11 +28,23 @@ app.use(bodyParser.json({ limit: "30mb" }));
 app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
 app.use(cors());
 app.use(cookieParser());
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || "secret",
+    saveUninitialized: true,
+    resave: false,
+    cookie: { maxAge: 60000 * 60 },
+  })
+);
 app.use(helmet());
 app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
 app.use(morgan("dev"));
+app.use(passport.initialize());
+app.use(passport.session());
+jwtStrategy(passport);
 
 // * Routes
+app.use("/auth", authRouter);
 app.use("/users", userRouter);
 app.use("/cats", catRouter);
 app.use("/cat-race", catBreedRouter);

@@ -1,10 +1,8 @@
 import { Request, Response } from "express";
-import bcrypt from "bcrypt";
-
 import myDataSource from "@/data-source";
 import { Cat } from "@/entity/Cat.entity";
 
-export class CatController {
+class CatController {
   private catRepostory = myDataSource.getRepository(Cat);
 
   public async createCat(req: Request, res: Response) {
@@ -85,3 +83,5 @@ export class CatController {
     }
   }
 }
+
+export default new CatController();

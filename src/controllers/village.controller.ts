@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import myDataSource from "@/data-source";
 import { Village } from "@/entity/Village.entity";
 
-export class VillageController {
+class VillageController {
   private villageRepostory = myDataSource.getRepository(Village);
 
   public async createVillage(req: Request, res: Response) {
@@ -83,3 +83,5 @@ export class VillageController {
     }
   }
 }
+
+export default new VillageController();

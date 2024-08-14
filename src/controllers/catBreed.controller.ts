@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import myDataSource from "@/data-source";
 import { CatBreed } from "@/entity/CatBreed.entity";
 
-export class CatBreedController {
+class CatBreedController {
   private catBreedRepostory = myDataSource.getRepository(CatBreed);
 
   public async createCatBreed(req: Request, res: Response) {
@@ -83,3 +83,5 @@ export class CatBreedController {
     }
   }
 }
+
+export default new CatBreedController();

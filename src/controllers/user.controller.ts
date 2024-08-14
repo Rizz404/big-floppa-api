@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 import myDataSource from "@/data-source";
 import { User } from "@/entity/User.entity";
 
-export class UserController {
+class UserController {
   private userRepostory = myDataSource.getRepository(User);
 
   public async createUser(req: Request, res: Response) {
@@ -131,3 +131,5 @@ export class UserController {
     }
   }
 }
+
+export default new UserController();

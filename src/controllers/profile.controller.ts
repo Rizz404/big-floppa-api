@@ -1,10 +1,9 @@
 import { Request, Response } from "express";
-import bcrypt from "bcrypt";
 
 import myDataSource from "@/data-source";
 import { Profile } from "@/entity/Profile.entity";
 
-export class ProfileController {
+class ProfileController {
   private profileRepostory = myDataSource.getRepository(Profile);
 
   public async createProfile(req: Request, res: Response) {
@@ -60,3 +59,5 @@ export class ProfileController {
     }
   }
 }
+
+export default new ProfileController();
