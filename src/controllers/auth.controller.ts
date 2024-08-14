@@ -117,9 +117,9 @@ class AuthController {
 
       if (!refreshToken) return res.status(204).json({ message: "No content" });
 
-      res.clearCookie("jwt", {
+      res.clearCookie("refreshToken", {
         httpOnly: true,
-        sameSite: "none",
+        sameSite: "strict",
         secure: true,
       });
       res.json({ message: "Logout Successfully" });

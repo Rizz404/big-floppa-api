@@ -1,22 +1,13 @@
 import profileController from "@/controllers/profile.controller";
+import { authenticateJWT } from "@/middleware/auth";
 import express from "express";
-import passport from "passport";
 
 const router = express.Router();
 
 router
   .route("/")
-  .post(
-    passport.authenticate("jwt", { session: false }),
-    profileController.createProfile
-  )
-  .get(
-    passport.authenticate("jwt", { session: false }),
-    profileController.getProfile
-  )
-  .patch(
-    passport.authenticate("jwt", { session: false }),
-    profileController.updateProfile
-  );
+  .post(authenticateJWT, profileController.createProfile)
+  .get(authenticateJWT, profileController.getProfile)
+  .patch(authenticateJWT, profileController.updateProfile);
 
 export { router as profileRouter };
