@@ -1,11 +1,12 @@
 import { Request, Response } from "express";
 import myDataSource from "@/data-source";
+import getErrorMessage from "@/utils/getErrorMessage";
 import { Province } from "@/entity/Province.entity";
 
 class ProvinceController {
   private provinceRepostory = myDataSource.getRepository(Province);
 
-  public async createProvince(req: Request, res: Response) {
+  public createProvince = async (req: Request, res: Response) => {
     try {
       const provinceData: Partial<Province> = req.body;
 
@@ -16,11 +17,11 @@ class ProvinceController {
       res.status(201).json({ message: "Cat race created", data: newProvince });
     } catch (error) {
       // todo: Buat type error
-      res.status(500).json({ message: error });
+      res.status(500).json({ message: getErrorMessage(error) });
     }
-  }
+  };
 
-  public async getProvinces(req: Request, res: Response) {
+  public getProvinces = async (req: Request, res: Response) => {
     try {
       const provinces = await this.provinceRepostory.find({
         relations: ["author"],
@@ -28,11 +29,11 @@ class ProvinceController {
 
       res.json(provinces);
     } catch (error) {
-      res.status(500).json({ message: error });
+      res.status(500).json({ message: getErrorMessage(error) });
     }
-  }
+  };
 
-  public async getProvinceById(req: Request, res: Response) {
+  public getProvinceById = async (req: Request, res: Response) => {
     try {
       const { provinceId } = req.params;
       const province = await this.provinceRepostory.findOne({
@@ -46,11 +47,11 @@ class ProvinceController {
 
       res.json(province);
     } catch (error) {
-      res.status(500).json({ message: error });
+      res.status(500).json({ message: getErrorMessage(error) });
     }
-  }
+  };
 
-  public async updateProvinceById(req: Request, res: Response) {
+  public updateProvinceById = async (req: Request, res: Response) => {
     try {
       const { provinceId } = req.params;
       const provinceData: Province = req.body;
@@ -68,20 +69,20 @@ class ProvinceController {
 
       res.json({ message: "Cat race updated", data: updatedProvince });
     } catch (error) {
-      res.status(500).json({ message: error });
+      res.status(500).json({ message: getErrorMessage(error) });
     }
-  }
+  };
 
-  public async deleteProvinceById(req: Request, res: Response) {
+  public deleteProvinceById = async (req: Request, res: Response) => {
     try {
       const { provinceId } = req.params;
       const deletedProvince = await this.provinceRepostory.delete(provinceId);
 
       res.json({ message: "Cat race deleted", data: deletedProvince });
     } catch (error) {
-      res.status(500).json({ message: error });
+      res.status(500).json({ message: getErrorMessage(error) });
     }
-  }
+  };
 }
 
 export default new ProvinceController();

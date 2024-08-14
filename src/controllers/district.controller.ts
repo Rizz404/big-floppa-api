@@ -1,11 +1,12 @@
 import { Request, Response } from "express";
 import myDataSource from "@/data-source";
+import getErrorMessage from "@/utils/getErrorMessage";
 import { District } from "@/entity/District.entity";
 
 class DistrictController {
   private districtRepostory = myDataSource.getRepository(District);
 
-  public async createDistrict(req: Request, res: Response) {
+  public createDistrict = async (req: Request, res: Response) => {
     try {
       const districtData: Partial<District> = req.body;
 
@@ -16,11 +17,11 @@ class DistrictController {
       res.status(201).json({ message: "Cat race created", data: newDistrict });
     } catch (error) {
       // todo: Buat type error
-      res.status(500).json({ message: error });
+      res.status(500).json({ message: getErrorMessage(error) });
     }
-  }
+  };
 
-  public async getDistricts(req: Request, res: Response) {
+  public getDistricts = async (req: Request, res: Response) => {
     try {
       const districts = await this.districtRepostory.find({
         relations: ["author"],
@@ -28,11 +29,11 @@ class DistrictController {
 
       res.json(districts);
     } catch (error) {
-      res.status(500).json({ message: error });
+      res.status(500).json({ message: getErrorMessage(error) });
     }
-  }
+  };
 
-  public async getDistrictById(req: Request, res: Response) {
+  public getDistrictById = async (req: Request, res: Response) => {
     try {
       const { districtId } = req.params;
       const district = await this.districtRepostory.findOne({
@@ -46,11 +47,11 @@ class DistrictController {
 
       res.json(district);
     } catch (error) {
-      res.status(500).json({ message: error });
+      res.status(500).json({ message: getErrorMessage(error) });
     }
-  }
+  };
 
-  public async updateDistrictById(req: Request, res: Response) {
+  public updateDistrictById = async (req: Request, res: Response) => {
     try {
       const { districtId } = req.params;
       const districtData: District = req.body;
@@ -68,20 +69,20 @@ class DistrictController {
 
       res.json({ message: "Cat race updated", data: updatedDistrict });
     } catch (error) {
-      res.status(500).json({ message: error });
+      res.status(500).json({ message: getErrorMessage(error) });
     }
-  }
+  };
 
-  public async deleteDistrictById(req: Request, res: Response) {
+  public deleteDistrictById = async (req: Request, res: Response) => {
     try {
       const { districtId } = req.params;
       const deletedDistrict = await this.districtRepostory.delete(districtId);
 
       res.json({ message: "Cat race deleted", data: deletedDistrict });
     } catch (error) {
-      res.status(500).json({ message: error });
+      res.status(500).json({ message: getErrorMessage(error) });
     }
-  }
+  };
 }
 
 export default new DistrictController();

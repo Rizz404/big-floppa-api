@@ -2,12 +2,13 @@ import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 
 import myDataSource from "@/data-source";
+import getErrorMessage from "@/utils/getErrorMessage";
 import { User } from "@/entity/User.entity";
 
 class UserController {
   private userRepostory = myDataSource.getRepository(User);
 
-  public async createUser(req: Request, res: Response) {
+  public createUser = async (req: Request, res: Response) => {
     try {
       const { password, ...userData }: Partial<User> = req.body;
       const salt = await bcrypt.genSalt();
@@ -28,21 +29,21 @@ class UserController {
       res.status(201).json({ message: "User created", data: newUser });
     } catch (error) {
       // todo: Buat type error
-      res.status(500).json({ message: error });
+      res.status(500).json({ message: getErrorMessage(error) });
     }
-  }
+  };
 
-  public async getUsers(req: Request, res: Response) {
+  public getUsers = async (req: Request, res: Response) => {
     try {
       const users = await this.userRepostory.find({ relations: ["profile"] });
 
       res.json(users);
     } catch (error) {
-      res.status(500).json({ message: error });
+      res.status(500).json({ message: getErrorMessage(error) });
     }
-  }
+  };
 
-  public async getUserById(req: Request, res: Response) {
+  public getUserById = async (req: Request, res: Response) => {
     try {
       const { userId } = req.params;
       const user = await this.userRepostory.findOne({
@@ -56,11 +57,11 @@ class UserController {
 
       res.json(user);
     } catch (error) {
-      res.status(500).json({ message: error });
+      res.status(500).json({ message: getErrorMessage(error) });
     }
-  }
+  };
 
-  public async updateUserById(req: Request, res: Response) {
+  public updateUserById = async (req: Request, res: Response) => {
     try {
       const { userId } = req.params;
       const userData: User = req.body;
@@ -77,11 +78,11 @@ class UserController {
 
       res.json({ message: "User updated", data: updatedUser });
     } catch (error) {
-      res.status(500).json({ message: error });
+      res.status(500).json({ message: getErrorMessage(error) });
     }
-  }
+  };
 
-  public async updateUserPassword(req: Request, res: Response) {
+  public updateUserPassword = async (req: Request, res: Response) => {
     try {
       const { userId } = req.params;
       const { oldPassword, newPassword } = req.body;
@@ -116,20 +117,20 @@ class UserController {
 
       res.json({ message: "User updated", data: updatedUser });
     } catch (error) {
-      res.status(500).json({ message: error });
+      res.status(500).json({ message: getErrorMessage(error) });
     }
-  }
+  };
 
-  public async deleteUserById(req: Request, res: Response) {
+  public deleteUserById = async (req: Request, res: Response) => {
     try {
       const { userId } = req.params;
       const deletedUser = await this.userRepostory.delete(userId);
 
       res.json({ message: "User deleted", data: deletedUser });
     } catch (error) {
-      res.status(500).json({ message: error });
+      res.status(500).json({ message: getErrorMessage(error) });
     }
-  }
+  };
 }
 
 export default new UserController();

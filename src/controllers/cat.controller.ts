@@ -1,11 +1,12 @@
 import { Request, Response } from "express";
 import myDataSource from "@/data-source";
+import getErrorMessage from "@/utils/getErrorMessage";
 import { Cat } from "@/entity/Cat.entity";
 
 class CatController {
   private catRepostory = myDataSource.getRepository(Cat);
 
-  public async createCat(req: Request, res: Response) {
+  public createCat = async (req: Request, res: Response) => {
     try {
       const catData: Partial<Cat> = req.body;
 
@@ -16,11 +17,11 @@ class CatController {
       res.status(201).json({ message: "Cat created", data: newCat });
     } catch (error) {
       // todo: Buat type error
-      res.status(500).json({ message: error });
+      res.status(500).json({ message: getErrorMessage(error) });
     }
-  }
+  };
 
-  public async getCats(req: Request, res: Response) {
+  public getCats = async (req: Request, res: Response) => {
     try {
       const cats = await this.catRepostory.find({
         relations: ["user", "catPictures", "catRaces"],
@@ -28,11 +29,11 @@ class CatController {
 
       res.json(cats);
     } catch (error) {
-      res.status(500).json({ message: error });
+      res.status(500).json({ message: getErrorMessage(error) });
     }
-  }
+  };
 
-  public async getCatById(req: Request, res: Response) {
+  public getCatById = async (req: Request, res: Response) => {
     try {
       const { catId } = req.params;
       const cat = await this.catRepostory.findOne({
@@ -46,11 +47,11 @@ class CatController {
 
       res.json(cat);
     } catch (error) {
-      res.status(500).json({ message: error });
+      res.status(500).json({ message: getErrorMessage(error) });
     }
-  }
+  };
 
-  public async updateCatById(req: Request, res: Response) {
+  public updateCatById = async (req: Request, res: Response) => {
     try {
       const { catId } = req.params;
       const catData: Cat = req.body;
@@ -68,20 +69,20 @@ class CatController {
 
       res.json({ message: "Cat updated", data: updatedCat });
     } catch (error) {
-      res.status(500).json({ message: error });
+      res.status(500).json({ message: getErrorMessage(error) });
     }
-  }
+  };
 
-  public async deleteCatById(req: Request, res: Response) {
+  public deleteCatById = async (req: Request, res: Response) => {
     try {
       const { catId } = req.params;
       const deletedCat = await this.catRepostory.delete(catId);
 
       res.json({ message: "Cat deleted", data: deletedCat });
     } catch (error) {
-      res.status(500).json({ message: error });
+      res.status(500).json({ message: getErrorMessage(error) });
     }
-  }
+  };
 }
 
 export default new CatController();

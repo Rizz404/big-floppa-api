@@ -1,11 +1,12 @@
 import { Request, Response } from "express";
 import myDataSource from "@/data-source";
+import getErrorMessage from "@/utils/getErrorMessage";
 import { CatBreed } from "@/entity/CatBreed.entity";
 
 class CatBreedController {
   private catBreedRepostory = myDataSource.getRepository(CatBreed);
 
-  public async createCatBreed(req: Request, res: Response) {
+  public createCatBreed = async (req: Request, res: Response) => {
     try {
       const catBreedData: Partial<CatBreed> = req.body;
 
@@ -16,11 +17,11 @@ class CatBreedController {
       res.status(201).json({ message: "Cat race created", data: newCatBreed });
     } catch (error) {
       // todo: Buat type error
-      res.status(500).json({ message: error });
+      res.status(500).json({ message: getErrorMessage(error) });
     }
-  }
+  };
 
-  public async getCatBreeds(req: Request, res: Response) {
+  public getCatBreeds = async (req: Request, res: Response) => {
     try {
       const catBreeds = await this.catBreedRepostory.find({
         relations: ["author"],
@@ -28,11 +29,11 @@ class CatBreedController {
 
       res.json(catBreeds);
     } catch (error) {
-      res.status(500).json({ message: error });
+      res.status(500).json({ message: getErrorMessage(error) });
     }
-  }
+  };
 
-  public async getCatBreedById(req: Request, res: Response) {
+  public getCatBreedById = async (req: Request, res: Response) => {
     try {
       const { catBreedId } = req.params;
       const catBreed = await this.catBreedRepostory.findOne({
@@ -46,11 +47,11 @@ class CatBreedController {
 
       res.json(catBreed);
     } catch (error) {
-      res.status(500).json({ message: error });
+      res.status(500).json({ message: getErrorMessage(error) });
     }
-  }
+  };
 
-  public async updateCatBreedById(req: Request, res: Response) {
+  public updateCatBreedById = async (req: Request, res: Response) => {
     try {
       const { catBreedId } = req.params;
       const catBreedData: CatBreed = req.body;
@@ -68,20 +69,20 @@ class CatBreedController {
 
       res.json({ message: "Cat race updated", data: updatedCatBreed });
     } catch (error) {
-      res.status(500).json({ message: error });
+      res.status(500).json({ message: getErrorMessage(error) });
     }
-  }
+  };
 
-  public async deleteCatBreedById(req: Request, res: Response) {
+  public deleteCatBreedById = async (req: Request, res: Response) => {
     try {
       const { catBreedId } = req.params;
       const deletedCatBreed = await this.catBreedRepostory.delete(catBreedId);
 
       res.json({ message: "Cat race deleted", data: deletedCatBreed });
     } catch (error) {
-      res.status(500).json({ message: error });
+      res.status(500).json({ message: getErrorMessage(error) });
     }
-  }
+  };
 }
 
 export default new CatBreedController();

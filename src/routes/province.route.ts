@@ -1,17 +1,16 @@
-import { ProvinceController } from "@/controllers/province.controller";
+import provinceController from "@/controllers/province.controller";
 import express from "express";
 
 const router = express.Router();
-const provinceRouter = new ProvinceController();
 
 router
   .route("/")
-  .get((req, res) => provinceRouter.getProvinces(req, res))
-  .post((req, res) => provinceRouter.createProvince(req, res));
+  .get(provinceController.getProvinces)
+  .post(provinceController.createProvince);
 router
   .route("/:provinceId")
-  .get((req, res) => provinceRouter.getProvinceById(req, res))
-  .patch((req, res) => provinceRouter.updateProvinceById(req, res))
-  .delete((req, res) => provinceRouter.deleteProvinceById(req, res));
+  .get(provinceController.getProvinceById)
+  .patch(provinceController.updateProvinceById)
+  .delete(provinceController.deleteProvinceById);
 
 export { router as provinceRouter };

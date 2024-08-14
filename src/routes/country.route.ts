@@ -1,17 +1,16 @@
-import { CountryController } from "@/controllers/country.controller";
+import countryController from "@/controllers/country.controller";
 import express from "express";
 
 const router = express.Router();
-const countryRouter = new CountryController();
 
 router
   .route("/")
-  .get((req, res) => countryRouter.getCountrys(req, res))
-  .post((req, res) => countryRouter.createCountry(req, res));
+  .get(countryController.getCountrys)
+  .post(countryController.createCountry);
 router
   .route("/:countryId")
-  .get((req, res) => countryRouter.getCountryById(req, res))
-  .patch((req, res) => countryRouter.updateCountryById(req, res))
-  .delete((req, res) => countryRouter.deleteCountryById(req, res));
+  .get(countryController.getCountryById)
+  .patch(countryController.updateCountryById)
+  .delete(countryController.deleteCountryById);
 
 export { router as countryRouter };

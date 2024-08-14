@@ -1,17 +1,16 @@
-import { DistrictController } from "@/controllers/district.controller";
+import districtController from "@/controllers/district.controller";
 import express from "express";
 
 const router = express.Router();
-const districtRouter = new DistrictController();
 
 router
   .route("/")
-  .get((req, res) => districtRouter.getDistricts(req, res))
-  .post((req, res) => districtRouter.createDistrict(req, res));
+  .get(districtController.getDistricts)
+  .post(districtController.createDistrict);
 router
   .route("/:districtId")
-  .get((req, res) => districtRouter.getDistrictById(req, res))
-  .patch((req, res) => districtRouter.updateDistrictById(req, res))
-  .delete((req, res) => districtRouter.deleteDistrictById(req, res));
+  .get(districtController.getDistrictById)
+  .patch(districtController.updateDistrictById)
+  .delete(districtController.deleteDistrictById);
 
 export { router as districtRouter };
