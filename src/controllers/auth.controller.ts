@@ -137,15 +137,27 @@ class AuthController {
   public logout: RequestHandler = async (req, res) => {
     try {
       const { refreshToken } = req.cookies;
+      const { isOauth } = req.user!;
 
       if (!refreshToken) return res.status(204).json({ message: "No content" });
+
+      if (!isOauth) {
+        res.clearCookie("refreshToken", {
+          httpOnly: true,
+          sameSite: "strict",
+          secure: true,
+        });
+        return res.json({ message: "Logout Successfully" });
+      }
+
+      const googleLogoutUrl = `https://accounts.google.com/logout`;
 
       res.clearCookie("refreshToken", {
         httpOnly: true,
         sameSite: "strict",
         secure: true,
       });
-      res.json({ message: "Logout Successfully" });
+      res.redirect(googleLogoutUrl);
     } catch (error) {
       res.status(500).json({ message: getErrorMessage(error) });
     }
