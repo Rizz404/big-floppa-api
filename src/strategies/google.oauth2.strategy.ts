@@ -13,13 +13,14 @@ const options: StrategyOptions = {
   authorizationURL: process.env.AUTHORIZATION_URL!,
   tokenURL: process.env.TOKEN_URL!,
   callbackURL: process.env.CALLBACK_URL!,
+  scope: ["profile", "email"],
 };
 
 const googleOauth2Strategy = (passport: PassportStatic) => {
   passport.use(
     new GoogleOauth2Strategy(
       options,
-      async (accessToken, refreshToken, profile, cb) => {
+      async (_accessToken, _refreshToken, profile, cb) => {
         try {
           console.log(profile);
           const userRepository = myDataSource.getRepository(User);
@@ -30,20 +31,12 @@ const googleOauth2Strategy = (passport: PassportStatic) => {
           if (!user) {
             user = userRepository.create({
               oauthId: profile.id,
-              username: profile.username,
-              email: profile.emails?.values.name,
+              username: `${profile._json.given_name}_${crypto.randomUUID()}`,
+              email: profile._json.email,
+              isOauth: true,
             });
             await userRepository.save(user);
           }
-
-          // ! belum taro token
-          const token = jwt.sign(
-            { id: user.id },
-            process.env.ACCESS_TOKEN || "secret",
-            {
-              expiresIn: "1h",
-            }
-          );
 
           cb(null, user);
         } catch (error) {

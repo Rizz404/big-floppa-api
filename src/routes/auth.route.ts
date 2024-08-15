@@ -6,24 +6,15 @@ const router = express.Router();
 
 router.post("/register", authController.register);
 router.post("/login", authController.login);
-router.post(
-  "/login-local",
-  passport.authenticate("local", { failureRedirect: "/login-failed" }),
-  (req, res) => {
-    res.json({ message: "Login successful", user: req.user });
-  }
-);
 router.get(
-  "/oauth2",
-  passport.authenticate("google", { scope: ["profile", "email"] })
+  "/google",
+  passport.authenticate("google", { accessType: "offline", prompt: "consent" })
 );
 
 router.get(
-  "/oauth2/callback",
+  "/google/callback",
   passport.authenticate("google", { failureRedirect: "/login" }),
-  (req, res) => {
-    res.json({ message: "OAuth2 login successful", data: req.user });
-  }
+  authController.googleOauthLogin
 );
 
 router.post("/refresh", authController.refresh);

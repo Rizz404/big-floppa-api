@@ -8,6 +8,29 @@ import jwt from "jsonwebtoken";
 class AuthController {
   private userRepository = myDataSource.getRepository(User);
 
+  private createAccessToken = (user: User) => {
+    return jwt.sign({ ...user }, process.env.ACCESS_TOKEN || "secret", {
+      expiresIn: "1h",
+    });
+  };
+
+  private createRefreshTokenAndSetCookie = (res: Response, userId: string) => {
+    const refreshToken = jwt.sign(
+      { id: userId },
+      process.env.REFRESH_TOKEN || "secret",
+      {
+        expiresIn: "30d",
+      }
+    );
+
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: process.env.NODE_ENV !== "development",
+      secure: true,
+      sameSite: "strict",
+      maxAge: 30 * 24 * 60 * 60 * 1000, // * 30 hari
+    });
+  };
+
   public register = async (req: Request, res: Response) => {
     try {
       const { username, email, password } = req.body;
@@ -44,29 +67,29 @@ class AuthController {
         return res.status(401).json({ message: "Password not match" });
       }
 
-      const accessToken = jwt.sign(
-        { ...user },
-        process.env.ACCESS_TOKEN || "secret",
-        {
-          expiresIn: "1h",
-        }
-      );
+      const accessToken = this.createAccessToken(user);
 
-      const refreshToken = jwt.sign(
-        { id: user.id },
-        process.env.REFRESH_TOKEN || "secret",
-        { expiresIn: "30d" }
-      );
-
-      res.cookie("refreshToken", refreshToken, {
-        httpOnly: process.env.NODE_ENV !== "development",
-        secure: true,
-        sameSite: "strict",
-        maxAge: 30 * 24 * 60 * 60 * 1000, // * 30 hari
-      });
+      this.createRefreshTokenAndSetCookie(res, user.id);
       res.json({
         message: "User log-in successfully",
         data: user,
+        accessToken,
+      });
+    } catch (error) {
+      res.status(500).json({ message: getErrorMessage(error) });
+    }
+  };
+
+  public googleOauthLogin: RequestHandler = async (req, res) => {
+    try {
+      const user = req.user!;
+
+      const accessToken = this.createAccessToken(user);
+
+      this.createRefreshTokenAndSetCookie(res, user.id);
+      res.json({
+        message: "OAuth2 login with google successful",
+        data: req.user,
         accessToken,
       });
     } catch (error) {
