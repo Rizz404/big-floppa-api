@@ -5,10 +5,7 @@ import express from "express";
 
 const router = express.Router();
 
-router
-  .route("/")
-  .get(authenticateJWT, userController.getUsers)
-  .post(userController.createUser);
+router.route("/").get(userController.getUsers).post(userController.createUser);
 router
   .route("/profile")
   .post(authenticateJWT, profileController.createProfile)

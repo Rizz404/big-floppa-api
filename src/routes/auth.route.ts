@@ -13,6 +13,19 @@ router.post(
     res.json({ message: "Login successful", user: req.user });
   }
 );
+router.get(
+  "/oauth2",
+  passport.authenticate("google", { scope: ["profile", "email"] })
+);
+
+router.get(
+  "/oauth2/callback",
+  passport.authenticate("google", { failureRedirect: "/login" }),
+  (req, res) => {
+    res.json({ message: "OAuth2 login successful", data: req.user });
+  }
+);
+
 router.post("/refresh", authController.refresh);
 router.post("/logout", authController.logout);
 

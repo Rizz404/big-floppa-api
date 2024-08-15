@@ -20,6 +20,7 @@ import { villageRouter } from "./routes/village.route";
 import jwtStrategy from "./strategies/jwt.strategy";
 import { authRouter } from "./routes/auth.route";
 import localStrategy from "./strategies/local.strategy";
+import googleOauth2Strategy from "./strategies/google.oauth2.strategy";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -43,6 +44,7 @@ app.use(morgan("dev"));
 app.use(passport.initialize());
 app.use(passport.session());
 jwtStrategy(passport);
+googleOauth2Strategy(passport);
 localStrategy(passport);
 
 // * Routes

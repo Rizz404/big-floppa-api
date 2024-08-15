@@ -26,6 +26,10 @@ export class User {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
+  @Index({ unique: true })
+  @Column({ nullable: true })
+  oauthId?: string;
+
   // * Kalau ada index dan true bersamaan usahakan di decorator saja
   @Index({ unique: true })
   @Column({ length: 50 })
