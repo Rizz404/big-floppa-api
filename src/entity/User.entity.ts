@@ -17,8 +17,8 @@ import { UserAddress } from "./UserAddress.entity";
 // * Urutannya migration:generate terus migration:run terus migration:create
 
 export enum UserRole {
-  ADMIN,
-  USER,
+  ADMIN = "ADMIN",
+  USER = "USER",
 }
 
 @Entity()

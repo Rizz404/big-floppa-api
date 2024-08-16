@@ -1,12 +1,14 @@
 import { Request, RequestHandler, Response } from "express";
 import myDataSource from "@/data-source";
 import getErrorMessage from "@/utils/getErrorMessage";
-import { User } from "@/entity/User.entity";
+import { User, UserRole } from "@/entity/User.entity";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { Profile } from "@/entity/Profile.entity";
 
 class AuthController {
   private userRepository = myDataSource.getRepository(User);
+  private profileRepository = myDataSource.getRepository(Profile);
 
   private createAccessToken = (user: User) => {
     return jwt.sign({ ...user }, process.env.ACCESS_TOKEN || "secret", {
@@ -33,17 +35,28 @@ class AuthController {
 
   public register = async (req: Request, res: Response) => {
     try {
-      const { username, email, password } = req.body;
-      const salt = await bcrypt.genSalt();
-      const hashedPassword = await bcrypt.hash(password, salt);
+      const { password, ...rest }: Partial<User> = req.body;
 
-      const user = this.userRepository.create({
-        username,
-        email,
+      const usersCount = await this.userRepository.count();
+
+      const salt = await bcrypt.genSalt();
+      const hashedPassword = await bcrypt.hash(password!, salt);
+
+      const newUser = this.userRepository.create({
+        ...rest,
         password: hashedPassword,
       });
 
-      await this.userRepository.save(user);
+      if (usersCount === 0) {
+        // ! ini isi objek bukan perbandingan inget itu
+        newUser.role = UserRole.ADMIN;
+      }
+
+      const newProfile = this.profileRepository.create();
+
+      await this.profileRepository.save(newProfile);
+      newUser.profile = newProfile;
+      await this.userRepository.save(newUser);
       res.status(201).json({ message: "User registered successfully" });
     } catch (error) {
       res.status(500).json({ message: getErrorMessage(error) });
@@ -147,17 +160,17 @@ class AuthController {
           sameSite: "strict",
           secure: true,
         });
-        return res.json({ message: "Logout Successfully" });
+        res.json({ message: "Logout Successfully" });
+      } else {
+        const googleLogoutUrl = `https://accounts.google.com/logout`;
+
+        res.clearCookie("refreshToken", {
+          httpOnly: true,
+          sameSite: "strict",
+          secure: true,
+        });
+        res.redirect(googleLogoutUrl);
       }
-
-      const googleLogoutUrl = `https://accounts.google.com/logout`;
-
-      res.clearCookie("refreshToken", {
-        httpOnly: true,
-        sameSite: "strict",
-        secure: true,
-      });
-      res.redirect(googleLogoutUrl);
     } catch (error) {
       res.status(500).json({ message: getErrorMessage(error) });
     }

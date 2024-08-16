@@ -12,11 +12,6 @@ import myDataSource from "./data-source";
 import { userRouter } from "./routes/user.route";
 import { catRouter } from "./routes/cat.route";
 import { catBreedRouter } from "./routes/catBreed.route";
-import { countryRouter } from "./routes/country.route";
-import { provinceRouter } from "./routes/province.route";
-import { cityRouter } from "./routes/city.route";
-import { districtRouter } from "./routes/district.route";
-import { villageRouter } from "./routes/village.route";
 import jwtStrategy from "./strategies/jwt.strategy";
 import { authRouter } from "./routes/auth.route";
 import localStrategy from "./strategies/local.strategy";
@@ -51,12 +46,7 @@ localStrategy(passport);
 app.use("/auth", authRouter);
 app.use("/users", userRouter);
 app.use("/cats", catRouter);
-app.use("/cat-race", catBreedRouter);
-app.use("/countries", countryRouter);
-app.use("/provinces", provinceRouter);
-app.use("/cities", cityRouter);
-app.use("/districts", districtRouter);
-app.use("/village", villageRouter);
+app.use("/cat-breeds", catBreedRouter);
 
 // * Server
 myDataSource
