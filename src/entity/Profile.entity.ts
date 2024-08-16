@@ -4,7 +4,10 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToOne,
+  JoinColumn,
 } from "typeorm";
+import { User } from "./User.entity";
 
 export enum Gender {
   Male,
@@ -33,7 +36,7 @@ export class Profile {
   @Column({ nullable: true, type: "smallint" })
   age?: number;
 
-  @Column({ nullable: true, length: 20 })
+  @Column({ nullable: true, length: 30 })
   phoneNumber?: string;
 
   @Column({ nullable: true, type: "text" })
@@ -44,4 +47,8 @@ export class Profile {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @OneToOne(() => User)
+  @JoinColumn()
+  user: User;
 }

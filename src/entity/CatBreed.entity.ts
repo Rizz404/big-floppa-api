@@ -30,7 +30,7 @@ export class CatBreed {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @ManyToOne(() => User, (user) => user.catRaces)
+  @ManyToOne(() => User, (user) => user.catBreeds)
   author: User;
 
   // * many to many cat races dan cat itu hanya ada di cat
