@@ -24,7 +24,7 @@ export class Cart {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToOne(() => User)
+  @OneToOne(() => User, (user) => user.cart)
   @JoinColumn()
   user: User;
 

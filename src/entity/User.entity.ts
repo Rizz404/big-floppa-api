@@ -47,13 +47,13 @@ export class User {
   @Column({ type: "enum", enum: UserRole, default: UserRole.USER })
   role: UserRole;
 
-  @Column({ default: false })
+  @Column({ type: "bool", default: false })
   isOauth: boolean;
 
   @Column({ nullable: true })
   lastLogin?: Date;
 
-  @Column({ default: false })
+  @Column({ type: "bool", default: false })
   isVerified: boolean;
 
   @CreateDateColumn()
@@ -66,10 +66,10 @@ export class User {
   userAddreses: UserAddress[];
 
   // * Relasi one to one begini
-  @OneToOne(() => Profile)
+  @OneToOne(() => Profile, (profile) => profile.user)
   profile: Profile;
 
-  @OneToOne(() => Cart)
+  @OneToOne(() => Cart, (cart) => cart.user)
   cart: Cart;
 
   @OneToMany(() => Cat, (cat) => cat.user)

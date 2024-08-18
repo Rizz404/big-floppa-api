@@ -5,6 +5,9 @@ import { User, UserRole } from "@/entity/User.entity";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { Profile } from "@/entity/Profile.entity";
+import { plainToInstance } from "class-transformer";
+import { validateOrReject } from "class-validator";
+import { CreateUserDto } from "@/dto/user.dto";
 
 class AuthController {
   private userRepository = myDataSource.getRepository(User);
@@ -52,12 +55,14 @@ class AuthController {
         newUser.role = UserRole.ADMIN;
       }
 
-      const newProfile = this.profileRepository.create();
+      const savedUser = await this.userRepository.save(newUser);
+
+      const newProfile = this.profileRepository.create({ user: savedUser });
 
       await this.profileRepository.save(newProfile);
-      newUser.profile = newProfile;
-      await this.userRepository.save(newUser);
-      res.status(201).json({ message: "User registered successfully" });
+      res
+        .status(201)
+        .json({ message: "User registered successfully", data: newUser });
     } catch (error) {
       res.status(500).json({ message: getErrorMessage(error) });
     }

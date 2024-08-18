@@ -10,9 +10,9 @@ import {
 import { User } from "./User.entity";
 
 export enum Gender {
-  Male,
-  Female,
-  Mental_Illness,
+  MALE = "MALE",
+  FEMALE = "FEMALE",
+  MENTAL_ILLNESS = "MENTAL_ILLNESS",
 }
 
 @Entity()
@@ -48,7 +48,7 @@ export class Profile {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToOne(() => User)
+  @OneToOne(() => User, (user) => user.profile)
   @JoinColumn()
   user: User;
 }

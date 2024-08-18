@@ -25,6 +25,7 @@ const jwtStrategy = (passport: PassportStatic) => {
         const userRepository = myDataSource.getRepository(UserModel);
         const user = await userRepository.findOne({
           where: { id: payload.id },
+          relations: { profile: true },
         });
 
         if (!user) {
