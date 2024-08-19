@@ -12,7 +12,7 @@ class AuthController {
 
   private createAccessToken = (user: User) => {
     return jwt.sign({ ...user }, process.env.ACCESS_TOKEN || "secret", {
-      expiresIn: "1h",
+      expiresIn: "30s",
     });
   };
 
@@ -140,7 +140,7 @@ class AuthController {
       const newAccessToken = jwt.sign(
         { ...user },
         process.env.ACCESS_TOKEN || "secret",
-        { expiresIn: "1h" }
+        { expiresIn: "30s" }
       );
 
       res.json({ message: "Refresh token successful", token: newAccessToken });
