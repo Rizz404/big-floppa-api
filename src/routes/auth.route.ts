@@ -1,5 +1,6 @@
 import authController from "@/controllers/auth.controller";
 import { CreateUserDto, LoginDto } from "@/dto/user.dto";
+import { auth } from "@/middleware/auth.middleware";
 import validateDto from "@/middleware/dto.validation.middleware";
 import express from "express";
 import passport from "passport";
@@ -23,7 +24,7 @@ router.get(
   authController.googleOauthLogin
 );
 
-router.post("/refresh", authController.refresh);
-router.post("/logout", authController.logout);
+router.post("/refresh", auth, authController.refresh);
+router.post("/logout", auth, authController.logout);
 
 export { router as authRouter };

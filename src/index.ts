@@ -16,6 +16,7 @@ import jwtStrategy from "./strategies/jwt.strategy";
 import { authRouter } from "./routes/auth.route";
 import localStrategy from "./strategies/local.strategy";
 import googleOauth2Strategy from "./strategies/google.oauth2.strategy";
+import allowedOrigins from "./config/allowedOrigins";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -23,7 +24,13 @@ const PORT = process.env.PORT || 5000;
 // * Middleware
 app.use(bodyParser.json({ limit: "30mb" }));
 app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
-app.use(cors());
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true,
+    optionsSuccessStatus: 200,
+  })
+);
 app.use(cookieParser());
 app.use(
   session({

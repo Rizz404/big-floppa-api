@@ -5,9 +5,6 @@ import { User, UserRole } from "@/entity/User.entity";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { Profile } from "@/entity/Profile.entity";
-import { plainToInstance } from "class-transformer";
-import { validateOrReject } from "class-validator";
-import { CreateUserDto } from "@/dto/user.dto";
 
 class AuthController {
   private userRepository = myDataSource.getRepository(User);
@@ -123,17 +120,17 @@ class AuthController {
         return res.status(401).json({ message: "Unautorized" });
       }
 
-      const decodedUserId = jwt.verify(
+      const decoded = jwt.verify(
         refreshToken,
         process.env.REFRESH_TOKEN || "secret"
-      );
+      ) as { id: string };
 
-      if (!decodedUserId) {
+      if (!decoded || !decoded.id) {
         return res.status(401).json({ message: "Invalid token" });
       }
 
       const user = await this.userRepository.findOne({
-        where: { id: decodedUserId as string },
+        where: { id: decoded.id },
       });
 
       if (!user) {
@@ -141,7 +138,7 @@ class AuthController {
       }
 
       const newAccessToken = jwt.sign(
-        user,
+        { ...user },
         process.env.ACCESS_TOKEN || "secret",
         { expiresIn: "1h" }
       );
@@ -158,7 +155,6 @@ class AuthController {
       const { isOauth } = req.user!;
 
       if (!refreshToken) return res.status(204).json({ message: "No content" });
-
       if (!isOauth) {
         res.clearCookie("refreshToken", {
           httpOnly: true,
@@ -168,7 +164,6 @@ class AuthController {
         res.json({ message: "Logout Successfully" });
       } else {
         const googleLogoutUrl = `https://accounts.google.com/logout`;
-
         res.clearCookie("refreshToken", {
           httpOnly: true,
           sameSite: "strict",
