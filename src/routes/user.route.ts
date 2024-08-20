@@ -1,5 +1,11 @@
 import userController from "@/controllers/user.controller";
-import { UserQueryDto } from "@/dto/user.dto";
+import {
+  CreateUserDto,
+  UpdateUserDto,
+  UpdateUserPasswordDto,
+  UpdateUserRoleDto,
+  UserQueryDto,
+} from "@/dto/user.dto";
 import { UserRole } from "@/entity/User.entity";
 import { auth } from "@/middleware/auth.middleware";
 import validateDto from "@/middleware/dto.validation.middleware";
@@ -16,17 +22,27 @@ router
     validateDto("query", UserQueryDto),
     userController.getUsers
   )
-  .post(auth, roleAccess(UserRole.ADMIN), userController.createUser);
+  .post(
+    auth,
+    roleAccess(UserRole.ADMIN),
+    validateDto("body", CreateUserDto),
+    userController.createUser
+  );
 router
   .route("/profile")
   .get(auth, (req, res) => {
     res.json(req.user);
   })
-  .patch(auth, userController.updateUserProfile);
+  .patch(
+    auth,
+    validateDto("body", UpdateUserDto),
+    userController.updateUserProfile
+  );
 router.patch(
   "/update-role/:userId",
   auth,
   roleAccess(UserRole.ADMIN),
+  validateDto("body", UpdateUserRoleDto),
   userController.updateUserRole
 );
 router.patch(
@@ -35,7 +51,12 @@ router.patch(
   roleAccess(UserRole.ADMIN),
   userController.verifiedUser
 );
-router.patch("/update-password", auth, userController.updateUserPassword);
+router.patch(
+  "/update-password",
+  auth,
+  validateDto("body", UpdateUserPasswordDto),
+  userController.updateUserPassword
+);
 router
   .route("/:userId")
   .get(userController.getUserById)

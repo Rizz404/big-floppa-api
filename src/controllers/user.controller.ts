@@ -71,9 +71,7 @@ class UserController {
         relations: { profile: true },
         order: { createdAt: order },
       });
-      const response = paginatedResponse(users, +page, +limit, totalData, {
-        fuck: "it",
-      });
+      const response = paginatedResponse(users, +page, +limit, totalData);
 
       res.json(response);
     } catch (error) {

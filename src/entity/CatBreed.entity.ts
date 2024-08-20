@@ -24,6 +24,13 @@ export class CatBreed {
   @Column({ type: "text" })
   description: string;
 
+  @Column({
+    nullable: true,
+    default:
+      "https://i.pinimg.com/736x/8a/92/c1/8a92c186ecd1ec07e49dc9f570e304cb.jpg",
+  })
+  image?: string;
+
   @CreateDateColumn()
   createdAt: Date;
 

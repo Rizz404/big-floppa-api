@@ -7,7 +7,10 @@ import {
   ValidateIf,
   IsIn,
   IsBooleanString,
+  IsEnum,
 } from "class-validator";
+import { UpdateProfileDto } from "./profile.dto";
+import { UserRole } from "@/entity/User.entity";
 
 export class CreateUserDto {
   @IsNotEmpty({ message: "Username is required" })
@@ -39,11 +42,41 @@ export class LoginDto {
   password?: string;
 }
 
+export class UpdateUserDto extends UpdateProfileDto {
+  @IsOptional()
+  @IsNotEmpty({ message: "Username is required" })
+  @Length(4, 20, { message: "Username must be between 4 and 20 characters" })
+  username?: string;
+
+  @IsOptional()
+  @IsNotEmpty({ message: "Email is required" })
+  @IsEmail({}, { message: "Invalid email format" })
+  email?: string;
+}
+
+export class UpdateUserPasswordDto {
+  @IsNotEmpty({ message: "Old password is required" })
+  @Length(6, 100, {
+    message: "Old password must be between 6 and 100 characters",
+  })
+  oldPassword?: string;
+
+  @IsNotEmpty({ message: "New password is required" })
+  @Length(6, 100, {
+    message: "NewPassword password must be between 6 and 100 characters",
+  })
+  newPassword?: string;
+}
+
+export class UpdateUserRoleDto {
+  @IsNotEmpty()
+  @IsEnum(UserRole, { message: "Role must be admin or user" })
+  role: string;
+}
+
 export class UserQueryDto extends BaseQueryDto {
   @IsOptional()
-  @IsIn(["ADMIN", "USER", "admin", "user"], {
-    message: "Role must be admin or user",
-  })
+  @IsEnum(UserRole, { message: "Role must be admin or user" })
   role?: string;
 
   @IsBooleanString()

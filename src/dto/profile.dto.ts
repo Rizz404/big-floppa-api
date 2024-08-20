@@ -1,5 +1,13 @@
 import { Gender } from "@/entity/Profile.entity";
-import { IsEnum, IsNumber, IsOptional, IsString } from "class-validator";
+import {
+  IsEnum,
+  IsInt,
+  IsOptional,
+  IsPhoneNumber,
+  IsString,
+  Max,
+  Min,
+} from "class-validator";
 
 export class UpdateProfileDto {
   @IsOptional()
@@ -19,11 +27,13 @@ export class UpdateProfileDto {
   gender?: Gender;
 
   @IsOptional()
-  @IsNumber({}, { message: "Must be number" })
+  @IsInt()
+  @Min(1, { message: "Age must be at least 1" })
+  @Max(120, { message: "Age must be less than or equal to 120" })
   age?: number;
 
   @IsOptional()
-  @IsString({ message: "Must be string" })
+  @IsPhoneNumber("ID", { message: "Invalid phone number" })
   phoneNumber?: string;
 
   @IsOptional()
