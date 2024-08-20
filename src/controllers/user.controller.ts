@@ -65,9 +65,9 @@ class UserController {
 
       const totalData = await this.userRepository.count();
       const users = await this.userRepository.find({
+        where: { role, isOauth, isVerified },
         take: +limit,
         skip: skip,
-        where: { role, isOauth, isVerified },
         relations: { profile: true },
         order: { createdAt: order },
       });

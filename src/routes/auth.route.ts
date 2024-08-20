@@ -24,7 +24,7 @@ router.get(
   authController.googleOauthLogin
 );
 
-router.post("/refresh", auth, authController.refresh);
+router.post("/refresh", authController.refresh);
 router.post("/logout", auth, authController.logout);
 
 export { router as authRouter };

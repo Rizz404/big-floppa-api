@@ -22,6 +22,8 @@ export enum OrderStatus {
   RECEIVED = "RECEIVED",
 }
 
+// ? Harusnya order status dan shipping service ada di order item kan
+
 @Entity()
 export class Order {
   @PrimaryGeneratedColumn("uuid")

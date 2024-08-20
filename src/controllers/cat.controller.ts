@@ -1,7 +1,13 @@
 import { Request, Response } from "express";
 import myDataSource from "@/data-source";
 import getErrorMessage from "@/utils/getErrorMessage";
-import { Cat } from "@/entity/Cat.entity";
+import { Cat, CatStatus } from "@/entity/Cat.entity";
+import BaseReqQuery from "@/helpers/base.req.query.type";
+import paginatedResponse from "@/utils/paginatedResponse";
+
+interface CatQuery extends BaseReqQuery {
+  status?: CatStatus;
+}
 
 class CatController {
   private catRepostory = myDataSource.getRepository(Cat);
@@ -23,11 +29,25 @@ class CatController {
 
   public getCats = async (req: Request, res: Response) => {
     try {
+      const {
+        page = 1,
+        limit = 10,
+        order = "desc",
+        status = CatStatus.AVAILABLE,
+      } = req.query as unknown as CatQuery;
+      const skip = (+page - 1) * +limit;
+
+      const totalData = await this.catRepostory.count({ where: { status } });
       const cats = await this.catRepostory.find({
-        relations: ["user", "catPictures", "catRaces"],
+        where: { status },
+        take: +limit,
+        skip,
+        order: { createdAt: order },
+        relations: { user: true, catBreed: true, catPictures: true },
       });
 
-      res.json(cats);
+      const response = paginatedResponse(cats, +page, +limit, totalData);
+      res.json(response);
     } catch (error) {
       res.status(500).json({ message: getErrorMessage(error) });
     }
@@ -38,7 +58,7 @@ class CatController {
       const { catId } = req.params;
       const cat = await this.catRepostory.findOne({
         where: { id: catId },
-        relations: ["user", "catPictures", "catRaces"],
+        relations: { user: true, catBreed: true, catPictures: true },
       });
 
       if (!cat) {
@@ -60,7 +80,7 @@ class CatController {
 
       const updatedCat = await this.catRepostory.findOne({
         where: { id: catId },
-        relations: ["user", "catPictures", "catRaces"],
+        relations: { user: true, catBreed: true, catPictures: true },
       });
 
       if (!updatedCat) {
