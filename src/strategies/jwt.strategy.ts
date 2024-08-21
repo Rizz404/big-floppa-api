@@ -6,10 +6,14 @@ import {
 import { PassportStatic } from "passport";
 import { User as UserModel } from "../entity/User.entity";
 import myDataSource from "../config/data-source";
+import { Server } from "socket.io";
 
 declare global {
   namespace Express {
     interface User extends UserModel {}
+    interface Request {
+      io: Server;
+    }
   }
 }
 

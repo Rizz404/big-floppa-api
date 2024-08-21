@@ -4,6 +4,8 @@ import getErrorMessage from "../utils/getErrorMessage";
 import { Cat, CatStatus } from "../entity/Cat.entity";
 import BaseReqQuery from "../helpers/base.req.query.type";
 import paginatedResponse from "../utils/paginatedResponse";
+import { sendNotification } from "../sockets/notificationHandler";
+import { Notification, NotificationType } from "../entity/Notification.entity";
 
 interface CatQuery extends BaseReqQuery {
   status?: CatStatus;
@@ -11,6 +13,7 @@ interface CatQuery extends BaseReqQuery {
 
 class CatController {
   private catRepostory = myDataSource.getRepository(Cat);
+  private notificationRepository = myDataSource.getRepository(Notification);
 
   public createCat = async (req: Request, res: Response) => {
     try {
@@ -19,6 +22,15 @@ class CatController {
       const newCat = this.catRepostory.create(catData);
 
       await this.catRepostory.save(newCat);
+
+      const newCatNotification = this.notificationRepository.create({
+        message: "Cat created",
+        type: NotificationType.NEW_CAT,
+      });
+
+      await this.notificationRepository.save(newCatNotification);
+
+      sendNotification(req.io, newCatNotification);
 
       res.status(201).json({ message: "Cat created", data: newCat });
     } catch (error) {

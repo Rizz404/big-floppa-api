@@ -7,10 +7,10 @@ const myDataSource = new DataSource({
   username: "root", // ! entah mengapa tidak bisa pakai env
   password: process.env.PASSWORD,
   database: "cat_adoption",
-  entities: ["../entity/*.ts"],
+  entities: [__dirname + "/../entity/*.ts"],
+  migrations: [__dirname + "/../migration/*.ts"],
   // synchronize: process.env.NODE_ENV === "development" ? true : false,
   logging: process.env.NODE_ENV === "development" ? true : false,
-  migrations: ["../migration/*.ts"],
   subscribers: [],
 });
 

@@ -4,19 +4,35 @@ import getErrorMessage from "../utils/getErrorMessage";
 import { CatBreed } from "../entity/CatBreed.entity";
 import BaseReqQuery from "../helpers/base.req.query.type";
 import paginatedResponse from "../utils/paginatedResponse";
+import { Notification, NotificationType } from "../entity/Notification.entity";
+import { sendNotification } from "../sockets/notificationHandler";
 
 interface BreedQuery extends BaseReqQuery {}
 
 class CatBreedController {
   private catBreedRepostory = myDataSource.getRepository(CatBreed);
+  private notificationRepository = myDataSource.getRepository(Notification);
 
   public createCatBreed = async (req: Request, res: Response) => {
     try {
+      const { id } = req.user!;
       const catBreedData: Partial<CatBreed> = req.body;
 
-      const newCatBreed = this.catBreedRepostory.create(catBreedData);
+      const newCatBreed = this.catBreedRepostory.create({
+        author: { id },
+        ...catBreedData,
+      });
 
       await this.catBreedRepostory.save(newCatBreed);
+
+      const newBreedNotification = this.notificationRepository.create({
+        message: "Breed created",
+        type: NotificationType.NEW_BREED,
+      });
+
+      await this.notificationRepository.save(newBreedNotification);
+
+      sendNotification(req.io, newBreedNotification);
 
       res.status(201).json({ message: "Cat race created", data: newCatBreed });
     } catch (error) {

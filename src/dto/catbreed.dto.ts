@@ -16,10 +16,6 @@ export class CreateBreedDto {
   @Length(3, 50, { message: "Name must be between 3 and 50 characters" })
   name: string;
 
-  @IsNotEmpty({ message: "Author is required" })
-  @IsUUID("4", { message: "Must be UUID" })
-  author: string;
-
   @IsNotEmpty({ message: "Description is required" })
   @IsString()
   @MinLength(4, { message: "Description must be greater then 4" })

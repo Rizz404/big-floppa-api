@@ -1,5 +1,5 @@
 import http from "http";
-import express from "express";
+import express, { Request, Response, NextFunction } from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
 import cookieParser from "cookie-parser";
@@ -19,6 +19,7 @@ import localStrategy from "./strategies/local.strategy";
 import googleOauth2Strategy from "./strategies/google.oauth2.strategy";
 import allowedOrigins from "./config/allowedOrigins";
 import { Server } from "socket.io";
+import socketConfig from "./sockets";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -52,13 +53,8 @@ jwtStrategy(passport);
 googleOauth2Strategy(passport);
 localStrategy(passport);
 
-// * Routes
-app.use("/auth", authRouter);
-app.use("/users", userRouter);
-app.use("/cats", catRouter);
-app.use("/cat-breeds", catBreedRouter);
-
-// * Socket io
+// * Socket io setup
+// ! harus dideklarasikan sebelum routes karena ini pake middleware
 const io = new Server(server, {
   cors: {
     origin: allowedOrigins,
@@ -66,6 +62,20 @@ const io = new Server(server, {
     optionsSuccessStatus: 200,
   },
 });
+
+app.use((req: Request, res: Response, next: NextFunction) => {
+  req.io = io;
+  next();
+});
+
+// * Routes
+app.use("/auth", authRouter);
+app.use("/users", userRouter);
+app.use("/cats", catRouter);
+app.use("/cat-breeds", catBreedRouter);
+
+// * Socket io config
+socketConfig(io);
 
 // * Server
 myDataSource
