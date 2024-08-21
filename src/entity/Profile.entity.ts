@@ -15,31 +15,31 @@ export enum Gender {
   MENTAL_ILLNESS = "MENTAL_ILLNESS",
 }
 
+// * Kalo mau jadi javascript harus explisit typenya
 @Entity()
 export class Profile {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
-  // * Defaultnya varchar
-  @Column({ nullable: true, length: 50 })
+  @Column({ type: "varchar", nullable: true, length: 50 })
   firstname?: string;
 
-  @Column({ nullable: true, length: 50 })
+  @Column({ type: "varchar", nullable: true, length: 50 })
   lastname?: string;
 
-  @Column({ nullable: true })
+  @Column({ type: "varchar", nullable: true })
   profilePicture?: string;
 
   @Column({ type: "enum", enum: Gender })
   gender?: Gender;
 
-  @Column({ nullable: true, type: "smallint" })
+  @Column({ type: "smallint", nullable: true })
   age?: number;
 
-  @Column({ nullable: true, length: 30 })
+  @Column({ type: "varchar", nullable: true, length: 30 })
   phoneNumber?: string;
 
-  @Column({ nullable: true, type: "text" })
+  @Column({ type: "text", nullable: true })
   bio?: string;
 
   @CreateDateColumn()

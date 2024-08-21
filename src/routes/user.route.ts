@@ -1,15 +1,15 @@
-import userController from "@/controllers/user.controller";
+import userController from "../controllers/user.controller";
 import {
   CreateUserDto,
   UpdateUserDto,
   UpdateUserPasswordDto,
   UpdateUserRoleDto,
   UserQueryDto,
-} from "@/dto/user.dto";
-import { UserRole } from "@/entity/User.entity";
-import { auth } from "@/middleware/auth.middleware";
-import validateDto from "@/middleware/dto.validation.middleware";
-import roleAccess from "@/middleware/role.access.middleware";
+} from "../dto/user.dto";
+import { UserRole } from "../entity/User.entity";
+import { auth } from "../middleware/auth.middleware";
+import validateDto from "../middleware/dto.validation.middleware";
+import roleAccess from "../middleware/role.access.middleware";
 import express from "express";
 
 const router = express.Router();

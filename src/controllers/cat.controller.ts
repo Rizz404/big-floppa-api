@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
-import myDataSource from "@/data-source";
-import getErrorMessage from "@/utils/getErrorMessage";
-import { Cat, CatStatus } from "@/entity/Cat.entity";
-import BaseReqQuery from "@/helpers/base.req.query.type";
-import paginatedResponse from "@/utils/paginatedResponse";
+import myDataSource from "../config/data-source";
+import getErrorMessage from "../utils/getErrorMessage";
+import { Cat, CatStatus } from "../entity/Cat.entity";
+import BaseReqQuery from "../helpers/base.req.query.type";
+import paginatedResponse from "../utils/paginatedResponse";
 
 interface CatQuery extends BaseReqQuery {
   status?: CatStatus;

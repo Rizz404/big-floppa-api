@@ -1,13 +1,13 @@
-import catBreedController from "@/controllers/catBreed.controller";
+import catBreedController from "../controllers/catBreed.controller";
 import {
   BreedQueryDto,
   CreateBreedDto,
   UpdateBreedDto,
-} from "@/dto/catbreed.dto";
-import { UserRole } from "@/entity/User.entity";
-import { auth } from "@/middleware/auth.middleware";
-import validateDto from "@/middleware/dto.validation.middleware";
-import roleAccess from "@/middleware/role.access.middleware";
+} from "../dto/catbreed.dto";
+import { UserRole } from "../entity/User.entity";
+import { auth } from "../middleware/auth.middleware";
+import validateDto from "../middleware/dto.validation.middleware";
+import roleAccess from "../middleware/role.access.middleware";
 import express from "express";
 
 const router = express.Router();

@@ -1,6 +1,6 @@
-import { CatStatus } from "@/entity/Cat.entity";
-import { Gender } from "@/entity/Profile.entity";
-import BaseQueryDto from "@/utils/base.query.dto";
+import { CatStatus } from "../entity/Cat.entity";
+import { Gender } from "../entity/Profile.entity";
+import BaseQueryDto from "../utils/base.query.dto";
 import {
   IsNotEmpty,
   Length,

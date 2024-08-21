@@ -1,4 +1,3 @@
-import { Gender } from "@/entity/Profile.entity";
 import {
   IsEnum,
   IsInt,
@@ -8,6 +7,7 @@ import {
   Max,
   Min,
 } from "class-validator";
+import { Gender } from "../entity/Profile.entity";
 
 export class UpdateProfileDto {
   @IsOptional()

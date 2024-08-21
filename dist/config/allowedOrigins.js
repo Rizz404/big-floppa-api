@@ -1,0 +1,2 @@
+Object.defineProperty(exports,"__esModule",{value:true});Object.defineProperty(exports,"default",{enumerable:true,get:function(){return _default}});const allowedOrigins=["http://localhost:5173","http://localhost:5000","http://localhost:5500","http://localhost:3000","http://localhost:3500","http://localhost:8000","http://localhost:8080"];const _default=allowedOrigins;
+//# sourceMappingURL=allowedOrigins.js.map

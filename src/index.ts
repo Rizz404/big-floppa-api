@@ -1,3 +1,4 @@
+import http from "http";
 import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
@@ -8,7 +9,7 @@ import session from "express-session";
 import passport from "passport";
 import "dotenv/config";
 import "reflect-metadata";
-import myDataSource from "./data-source";
+import myDataSource from "./config/data-source";
 import { userRouter } from "./routes/user.route";
 import { catRouter } from "./routes/cat.route";
 import { catBreedRouter } from "./routes/catBreed.route";
@@ -17,9 +18,11 @@ import { authRouter } from "./routes/auth.route";
 import localStrategy from "./strategies/local.strategy";
 import googleOauth2Strategy from "./strategies/google.oauth2.strategy";
 import allowedOrigins from "./config/allowedOrigins";
+import { Server } from "socket.io";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const server = http.createServer(app);
 
 // * Middleware
 app.use(bodyParser.json({ limit: "30mb" }));
@@ -55,11 +58,20 @@ app.use("/users", userRouter);
 app.use("/cats", catRouter);
 app.use("/cat-breeds", catBreedRouter);
 
+// * Socket io
+const io = new Server(server, {
+  cors: {
+    origin: allowedOrigins,
+    credentials: true,
+    optionsSuccessStatus: 200,
+  },
+});
+
 // * Server
 myDataSource
   .initialize()
   .then(async () => {
-    app.listen(PORT, () => {
+    server.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });
     console.log("Data Source has been initialized!");

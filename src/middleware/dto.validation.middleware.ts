@@ -1,4 +1,4 @@
-import getErrorMessage from "@/utils/getErrorMessage";
+import getErrorMessage from "../utils/getErrorMessage";
 import { plainToInstance } from "class-transformer";
 import { validateOrReject } from "class-validator";
 import { NextFunction, Request, Response } from "express";

@@ -3,8 +3,8 @@ import {
   StrategyOptions,
 } from "passport-google-oauth20";
 import { PassportStatic } from "passport";
-import { User } from "@/entity/User.entity";
-import myDataSource from "@/data-source";
+import { User } from "../entity/User.entity";
+import myDataSource from "../config/data-source";
 import jwt from "jsonwebtoken";
 
 const options: StrategyOptions = {

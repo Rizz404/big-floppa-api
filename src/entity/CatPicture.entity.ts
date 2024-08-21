@@ -13,28 +13,28 @@ export class CatPicture {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
-  @Column({ nullable: true })
+  @Column({ type: "varchar", nullable: true })
   fieldname?: string;
 
-  @Column()
+  @Column({ type: "varchar" })
   originalname: string;
 
-  @Column()
+  @Column({ type: "varchar" })
   mimetype: string;
 
-  @Column()
+  @Column({ type: "int" })
   size: number;
 
-  @Column({ nullable: true })
+  @Column({ type: "varchar", nullable: true })
   destination?: string;
 
-  @Column({ nullable: true })
+  @Column({ type: "varchar", nullable: true })
   filename?: string;
 
-  @Column()
+  @Column({ type: "varchar" })
   path: string;
 
-  @Column()
+  @Column({ type: "varchar" })
   url: string;
 
   @CreateDateColumn()

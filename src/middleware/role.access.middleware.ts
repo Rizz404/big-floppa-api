@@ -1,4 +1,4 @@
-import { UserRole } from "@/entity/User.entity";
+import { UserRole } from "../entity/User.entity";
 import { RequestHandler } from "express";
 
 const roleAccess = (role: UserRole): RequestHandler => {

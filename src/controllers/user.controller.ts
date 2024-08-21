@@ -1,13 +1,13 @@
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 
-import myDataSource from "@/data-source";
-import getErrorMessage from "@/utils/getErrorMessage";
-import { User, UserRole } from "@/entity/User.entity";
-import { Profile } from "@/entity/Profile.entity";
+import myDataSource from "../config/data-source";
+import getErrorMessage from "../utils/getErrorMessage";
+import { User, UserRole } from "../entity/User.entity";
+import { Profile } from "../entity/Profile.entity";
 import { RequestHandler } from "express-serve-static-core";
-import BaseReqQuery from "@/helpers/base.req.query.type";
-import paginatedResponse from "@/utils/paginatedResponse";
+import BaseReqQuery from "../helpers/base.req.query.type";
+import paginatedResponse from "../utils/paginatedResponse";
 
 interface UserQuery extends BaseReqQuery {
   role?: UserRole;

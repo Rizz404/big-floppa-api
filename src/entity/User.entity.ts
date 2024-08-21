@@ -30,27 +30,32 @@ export class User {
   id: string;
 
   @Index({ unique: true })
-  @Column({ nullable: true })
+  @Column({ type: "varchar", nullable: true })
   oauthId?: string;
 
   // * Kalau ada index dan true bersamaan usahakan di decorator saja
   @Index({ unique: true })
-  @Column({ length: 50 })
+  @Column({ type: "varchar", length: 50 })
   username: string;
 
+  @Index({ unique: true })
   @Column({ type: "varchar" })
   email: string;
 
-  @Column({ nullable: true, length: 255 })
+  @Column({ type: "varchar", nullable: true, length: 255 })
   password?: string;
 
-  @Column({ type: "enum", enum: UserRole, default: UserRole.USER })
+  @Column({
+    type: "enum",
+    enum: UserRole,
+    default: UserRole.USER,
+  })
   role: UserRole;
 
   @Column({ type: "bool", default: false })
   isOauth: boolean;
 
-  @Column({ nullable: true })
+  @Column({ type: "date", nullable: true })
   lastLogin?: Date;
 
   @Column({ type: "bool", default: false })

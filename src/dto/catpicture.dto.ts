@@ -1,5 +1,3 @@
-import { CatStatus } from "@/entity/Cat.entity";
-import { Gender } from "@/entity/Profile.entity";
 import {
   IsNotEmpty,
   Length,

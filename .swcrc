@@ -5,10 +5,10 @@
       "syntax": "typescript",
       "tsx": false,
       "dynamicImport": true,
-      "decorators": false
+      "decorators": true
     },
     "transform": {},
-    "target": "es2016",
+    "target": "esnext",
     "loose": false,
     "externalHelpers": false,
     "keepClassNames": false
@@ -20,5 +20,6 @@
     "noInterop": false,
     "lazy": false
   },
-  "minify": true
+  "minify": true,
+  "sourceMaps": true
 }

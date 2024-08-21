@@ -1,4 +1,4 @@
-import BaseQueryDto from "@/utils/base.query.dto";
+import BaseQueryDto from "../utils/base.query.dto";
 import {
   IsEmail,
   IsNotEmpty,
@@ -10,7 +10,7 @@ import {
   IsEnum,
 } from "class-validator";
 import { UpdateProfileDto } from "./profile.dto";
-import { UserRole } from "@/entity/User.entity";
+import { UserRole } from "../entity/User.entity";
 
 export class CreateUserDto {
   @IsNotEmpty({ message: "Username is required" })

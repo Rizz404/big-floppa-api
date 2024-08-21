@@ -4,8 +4,8 @@ import {
   StrategyOptions,
 } from "passport-jwt";
 import { PassportStatic } from "passport";
-import { User as UserModel } from "@/entity/User.entity";
-import myDataSource from "@/data-source";
+import { User as UserModel } from "../entity/User.entity";
+import myDataSource from "../config/data-source";
 
 declare global {
   namespace Express {

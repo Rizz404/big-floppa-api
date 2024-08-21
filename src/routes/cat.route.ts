@@ -1,4 +1,4 @@
-import catController from "@/controllers/cat.controller";
+import catController from "../controllers/cat.controller";
 import express from "express";
 import passport from "passport";
 

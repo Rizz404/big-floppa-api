@@ -1,7 +1,7 @@
 import passport, { PassportStatic } from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
-import { User } from "@/entity/User.entity";
-import myDataSource from "@/data-source";
+import { User } from "../entity/User.entity";
+import myDataSource from "../config/data-source";
 import bcrypt from "bcrypt";
 
 passport.serializeUser((user, done) => {

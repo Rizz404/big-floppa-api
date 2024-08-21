@@ -1,0 +1,2 @@
+Object.defineProperty(exports,"__esModule",{value:true});Object.defineProperty(exports,"default",{enumerable:true,get:function(){return _default}});const _typeorm=require("typeorm");const myDataSource=new _typeorm.DataSource({type:"mysql",host:process.env.HOST,port:process.env.DATABASE_PORT,username:"root",password:process.env.PASSWORD,database:"cat_adoption",entities:["../entity/*.ts"],logging:process.env.NODE_ENV==="development"?true:false,migrations:["../migration/*.ts"],subscribers:[]});const _default=myDataSource;
+//# sourceMappingURL=data-source.js.map

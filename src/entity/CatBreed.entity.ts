@@ -18,13 +18,14 @@ export class CatBreed {
   id: string;
 
   @Index({ unique: true })
-  @Column({ length: 100 })
+  @Column({ type: "varchar", length: 100 })
   name: string;
 
   @Column({ type: "text" })
   description: string;
 
   @Column({
+    type: "varchar",
     nullable: true,
     default:
       "https://i.pinimg.com/736x/8a/92/c1/8a92c186ecd1ec07e49dc9f570e304cb.jpg",

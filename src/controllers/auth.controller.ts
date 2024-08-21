@@ -1,10 +1,10 @@
 import { Request, RequestHandler, Response } from "express";
-import myDataSource from "@/data-source";
-import getErrorMessage from "@/utils/getErrorMessage";
-import { User, UserRole } from "@/entity/User.entity";
+import myDataSource from "../config/data-source";
+import getErrorMessage from "../utils/getErrorMessage";
+import { User, UserRole } from "../entity/User.entity";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { Profile } from "@/entity/Profile.entity";
+import { Profile } from "../entity/Profile.entity";
 
 class AuthController {
   private userRepository = myDataSource.getRepository(User);
