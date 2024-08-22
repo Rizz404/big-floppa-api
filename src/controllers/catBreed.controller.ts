@@ -28,6 +28,7 @@ class CatBreedController {
       const newBreedNotification = this.notificationRepository.create({
         message: "Breed created",
         type: NotificationType.NEW_BREED,
+        isGlobal: true,
       });
 
       await this.notificationRepository.save(newBreedNotification);

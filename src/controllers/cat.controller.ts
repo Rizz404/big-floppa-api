@@ -6,6 +6,8 @@ import BaseReqQuery from "../helpers/base.req.query.type";
 import paginatedResponse from "../utils/paginatedResponse";
 import { sendNotification } from "../sockets/notificationHandler";
 import { Notification, NotificationType } from "../entity/Notification.entity";
+import { CatBreedFollowed } from "../entity/CatBreedFollowed.entity";
+import { In } from "typeorm";
 
 interface CatQuery extends BaseReqQuery {
   status?: CatStatus;
@@ -13,6 +15,8 @@ interface CatQuery extends BaseReqQuery {
 
 class CatController {
   private catRepostory = myDataSource.getRepository(Cat);
+  private catBreedFollowedRepostory =
+    myDataSource.getRepository(CatBreedFollowed);
   private notificationRepository = myDataSource.getRepository(Notification);
 
   public createCat = async (req: Request, res: Response) => {
@@ -23,9 +27,17 @@ class CatController {
 
       await this.catRepostory.save(newCat);
 
+      const userFollowedBreeds = await this.catBreedFollowedRepostory.find({
+        where: { catBreed: { id: catData.catBreed?.id } },
+        relations: { user: true, catBreed: true },
+      });
+
+      console.log(userFollowedBreeds);
+
       const newCatNotification = this.notificationRepository.create({
         message: "Cat created",
         type: NotificationType.NEW_CAT,
+        users: userFollowedBreeds.map((followed) => followed.user),
       });
 
       await this.notificationRepository.save(newCatNotification);

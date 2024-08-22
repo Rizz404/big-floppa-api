@@ -8,6 +8,7 @@ import {
   OneToOne,
   JoinColumn,
   OneToMany,
+  ManyToMany,
 } from "typeorm";
 import { Profile } from "./Profile.entity";
 import { Cat } from "./Cat.entity";
@@ -16,6 +17,8 @@ import { UserAddress } from "./UserAddress.entity";
 import { Cart } from "./Cart.entity";
 import { Transaction } from "./Transaction.entity";
 import { Order } from "./Order.entity";
+import { Notification } from "./Notification.entity";
+import { CatBreedFollowed } from "./CatBreedFollowed.entity";
 
 // * Urutannya migration:generate terus migration:run terus migration:create
 
@@ -91,4 +94,13 @@ export class User {
 
   @OneToMany(() => Order, (order) => order.user)
   orders: Order[];
+
+  @OneToMany(
+    () => CatBreedFollowed,
+    (catBreedFollowed) => catBreedFollowed.user
+  )
+  catBreedFolloweds: CatBreedFollowed[];
+
+  @ManyToMany(() => Notification, (notification) => notification.users)
+  notifications: Notification[];
 }

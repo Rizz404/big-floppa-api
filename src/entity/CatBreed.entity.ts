@@ -10,6 +10,7 @@ import {
 } from "typeorm";
 import { User } from "./User.entity";
 import { Cat } from "./Cat.entity";
+import { CatBreedFollowed } from "./CatBreedFollowed.entity";
 
 // ! Ganti jadi Breed ya kali race lu kira orang
 @Entity()
@@ -44,4 +45,10 @@ export class CatBreed {
   // * many to many cat races dan cat itu hanya ada di cat
   @OneToMany(() => Cat, (cat) => cat.catBreed)
   cats: Cat[];
+
+  @OneToMany(
+    () => CatBreedFollowed,
+    (catBreedFollowed) => catBreedFollowed.catBreed
+  )
+  catBreedFolloweds: CatBreedFollowed[];
 }

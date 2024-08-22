@@ -2,9 +2,13 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinTable,
+  ManyToMany,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
+import { User } from "./User.entity";
 
 export enum NotificationType {
   ORDER_CREATED = "ORDER_CREATED",
@@ -34,9 +38,16 @@ export class Notification {
   @Column({ type: "varchar", nullable: true })
   link?: string;
 
+  @Column({ type: "bool", default: false })
+  isGlobal: boolean;
+
   @CreateDateColumn()
   createdAt: Date;
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @ManyToMany(() => User, (user) => user.notifications)
+  @JoinTable()
+  users: User[];
 }

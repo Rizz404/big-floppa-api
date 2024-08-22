@@ -20,6 +20,7 @@ import googleOauth2Strategy from "./strategies/google.oauth2.strategy";
 import allowedOrigins from "./config/allowedOrigins";
 import { Server } from "socket.io";
 import socketConfig from "./sockets";
+import { catBreedsFollowedRouter } from "./routes/catBreedFollowed.route";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -73,6 +74,7 @@ app.use("/auth", authRouter);
 app.use("/users", userRouter);
 app.use("/cats", catRouter);
 app.use("/cat-breeds", catBreedRouter);
+app.use("/cat-breeds-followed", catBreedsFollowedRouter);
 
 // * Socket io config
 socketConfig(io);

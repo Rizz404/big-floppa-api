@@ -1,20 +1,17 @@
 import catController from "../controllers/cat.controller";
 import express from "express";
-import passport from "passport";
+import { auth } from "../middleware/auth.middleware";
 
 const router = express.Router();
 
 router
   .route("/")
   .get(catController.getCats)
-  .post(
-    passport.authenticate("jwt", { session: false }),
-    catController.createCat
-  );
+  .post(auth, catController.createCat);
 router
   .route("/:catId")
   .get(catController.getCatById)
-  .patch(catController.updateCatById)
-  .delete(catController.deleteCatById);
+  .patch(auth, catController.updateCatById)
+  .delete(auth, catController.deleteCatById);
 
 export { router as catRouter };
