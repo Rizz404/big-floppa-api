@@ -6,7 +6,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
-import { Order } from "./Order.entity";
+import { OrderItem } from "./OrderItem.entity";
 
 @Entity()
 export class ShippingService {
@@ -28,6 +28,6 @@ export class ShippingService {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToMany(() => Order, (order) => order.shippingService)
-  orders: Order[];
+  @OneToMany(() => OrderItem, (orderItem) => orderItem.shippingService)
+  orderItems: OrderItem[];
 }

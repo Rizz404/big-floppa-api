@@ -13,7 +13,7 @@ import { User } from "./User.entity";
 import { CatPicture } from "./CatPicture.entity";
 import { CatBreed } from "./CatBreed.entity";
 import { CartItem } from "./CartItem.entity";
-import { Order } from "./Order.entity";
+import { OrderItem } from "./OrderItem.entity";
 
 export enum CatStatus {
   AVAILABLE = "AVAILABLE",
@@ -25,6 +25,12 @@ export enum CatStatus {
 export class Cat {
   @PrimaryGeneratedColumn("uuid")
   id: string;
+
+  @ManyToOne(() => User, (user) => user.cats)
+  user: User;
+
+  @ManyToOne(() => CatBreed, (catBreed) => catBreed.cats)
+  catBreed: CatBreed;
 
   @Index()
   @Column({ type: "varchar", nullable: true })
@@ -54,18 +60,12 @@ export class Cat {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @ManyToOne(() => User, (user) => user.cats)
-  user: User;
-
   @OneToMany(() => CatPicture, (catPicture) => catPicture.cat)
   catPictures: CatPicture[];
-
-  @ManyToOne(() => CatBreed, (catBreed) => catBreed.cats)
-  catBreed: CatBreed;
 
   @OneToMany(() => CartItem, (cartItem) => cartItem.cat)
   cartItems: CartItem[];
 
-  @OneToMany(() => Order, (order) => order.cat)
-  orders: Order[];
+  @OneToMany(() => OrderItem, (orderItem) => orderItem.cat)
+  orderItems: OrderItem[];
 }

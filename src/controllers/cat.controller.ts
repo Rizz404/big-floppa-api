@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Request, RequestHandler, Response } from "express";
 import myDataSource from "../config/data-source";
 import getErrorMessage from "../utils/getErrorMessage";
 import { Cat, CatStatus } from "../entity/Cat.entity";
@@ -8,6 +8,7 @@ import { sendNotification } from "../sockets/notificationHandler";
 import { Notification, NotificationType } from "../entity/Notification.entity";
 import { CatBreedFollowed } from "../entity/CatBreedFollowed.entity";
 import { In } from "typeorm";
+import { Order, OrderStatus } from "../entity/Order.entity";
 
 interface CatQuery extends BaseReqQuery {
   status?: CatStatus;
@@ -17,6 +18,7 @@ class CatController {
   private catRepostory = myDataSource.getRepository(Cat);
   private catBreedFollowedRepostory =
     myDataSource.getRepository(CatBreedFollowed);
+  private orderRepository = myDataSource.getRepository(Order);
   private notificationRepository = myDataSource.getRepository(Notification);
 
   public createCat = async (req: Request, res: Response) => {
@@ -50,6 +52,30 @@ class CatController {
       res.status(500).json({ message: getErrorMessage(error) });
     }
   };
+
+  // public buyCat: RequestHandler = async (req, res) => {
+  //   try {
+  //     const { id } = req.user!;
+  //     const { catId } = req.params;
+  //     const { shippingServiceId } = req.body;
+
+  //     const cat = await this.catRepostory.findOne({ where: { id: catId } });
+
+  //     if (!cat) {
+  //       return res.status(404).json({ message: "Cat not found" });
+  //     }
+
+  //     const createOrder = this.orderRepository.create({
+  //       cat,
+  //       user: { id },
+  //       amount: cat.quantity,
+  //       shippingService: { id: shippingServiceId },
+  //       status: OrderStatus.PENDING,
+  //     });
+  //   } catch (error) {
+  //     res.status(500).json({ message: getErrorMessage(error) });
+  //   }
+  // };
 
   public getCats = async (req: Request, res: Response) => {
     try {

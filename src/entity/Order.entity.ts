@@ -14,8 +14,10 @@ import { User } from "./User.entity";
 import { ShippingService } from "./ShippingService.entity";
 import { Transaction } from "./Transaction.entity";
 import { Cat } from "./Cat.entity";
+import { OrderItem } from "./OrderItem.entity";
 
 export enum OrderStatus {
+  PENDING = "PENDING",
   PACKAGING = "PACKAGING",
   SHIPPED = "SHIPPED",
   DELIVERED = "DELIVERED",
@@ -29,27 +31,18 @@ export class Order {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
-  @Column({ type: "enum", enum: OrderStatus, default: OrderStatus.PACKAGING })
-  status: OrderStatus;
+  @ManyToOne(() => User, (user) => user.orders)
+  user: User;
 
-  @Column({ type: "int", default: 1 })
-  amount: number;
+  @ManyToOne(() => Transaction, (transaction) => transaction.orders)
+  transaction: Transaction;
+
+  @OneToMany(() => OrderItem, (orderItem) => orderItem.order)
+  orderItems: OrderItem[];
 
   @CreateDateColumn()
   createdAt: Date;
 
   @UpdateDateColumn()
   updatedAt: Date;
-
-  @ManyToOne(() => User, (user) => user.orders)
-  user: User;
-
-  @ManyToOne(() => Cat, (cat) => cat.orders)
-  cat: Cat;
-
-  @ManyToOne(() => ShippingService, (shippingService) => shippingService.orders)
-  shippingService: ShippingService;
-
-  @ManyToOne(() => Transaction, (transaction) => transaction.orders)
-  transaction: Transaction;
 }
