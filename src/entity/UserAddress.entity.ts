@@ -3,15 +3,20 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
 import { User } from "./User.entity";
+import { Order } from "./Order.entity";
 
 @Entity()
 export class UserAddress {
   @PrimaryGeneratedColumn("uuid")
   id: string;
+
+  @Column({ type: "boolean" })
+  isPrimaryAddress: boolean;
 
   @Column({ type: "varchar" })
   country: string;
@@ -36,6 +41,9 @@ export class UserAddress {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @OneToMany(() => Order, (order) => order.userAddress)
+  orders: Order[];
 
   @ManyToOne(() => User, (user) => user.userAddreses)
   user: User;

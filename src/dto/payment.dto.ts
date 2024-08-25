@@ -1,4 +1,4 @@
-import { PaymentStatus } from "../entity/Payment.entity";
+import { PaymentStatus } from "../entity/PaymentMethod.entity";
 import { IsEnum, IsNotEmpty } from "class-validator";
 
 export class CreatePaymentDto {

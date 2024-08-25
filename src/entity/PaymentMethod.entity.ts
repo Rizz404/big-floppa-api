@@ -8,22 +8,19 @@ import {
 } from "typeorm";
 import { Transaction } from "./Transaction.entity";
 
-export enum PaymentStatus {
-  PENDING = "PENDING",
-  COMPLETED = "COMPLETED",
-  FAILED = "FAILED",
-}
-
 @Entity()
-export class Payment {
+export class PaymentMethod {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
   @Column({ type: "varchar", length: 50 })
-  paymentMethod: string;
+  name: string;
 
-  @Column({ type: "enum", enum: PaymentStatus, default: PaymentStatus.PENDING })
-  status: PaymentStatus;
+  @Column({ type: "text" })
+  description: string;
+
+  @Column({ type: "decimal", default: 0 })
+  paymentFee: number;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -31,6 +28,6 @@ export class Payment {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToMany(() => Transaction, (transaction) => transaction.payment)
+  @OneToMany(() => Transaction, (transaction) => transaction.paymentMethod)
   transactions: Transaction[];
 }

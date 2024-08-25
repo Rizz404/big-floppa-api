@@ -2,7 +2,6 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  Index,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -10,15 +9,28 @@ import {
 } from "typeorm";
 import { User } from "./User.entity";
 import { Order } from "./Order.entity";
-import { Payment } from "./Payment.entity";
+import { PaymentMethod } from "./PaymentMethod.entity";
+
+export enum PaymentStatus {
+  PENDING = "PENDING",
+  COMPLETED = "COMPLETED",
+  FAILED = "FAILED",
+}
 
 @Entity()
 export class Transaction {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
-  @Column({ type: "decimal" })
-  fee: number;
+  @Column({ type: "decimal", default: 0 })
+  adminFee: number;
+
+  @Column({
+    type: "enum",
+    enum: PaymentStatus,
+    default: PaymentStatus.PENDING,
+  })
+  status: PaymentStatus;
 
   @Column({ type: "decimal" })
   subTotal: number;
@@ -41,8 +53,8 @@ export class Transaction {
   @ManyToOne(() => User, (user) => user.sellerTransactions)
   seller: User;
 
-  @ManyToOne(() => Payment, (payment) => payment.transactions)
-  payment: Payment;
+  @ManyToOne(() => PaymentMethod, (paymentMethod) => paymentMethod.transactions)
+  paymentMethod: PaymentMethod;
 
   @OneToMany(() => Order, (order) => order.transaction)
   orders: Order;

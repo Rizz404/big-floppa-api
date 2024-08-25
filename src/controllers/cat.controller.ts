@@ -7,18 +7,25 @@ import paginatedResponse from "../utils/paginatedResponse";
 import { sendNotification } from "../sockets/notificationHandler";
 import { Notification, NotificationType } from "../entity/Notification.entity";
 import { CatBreedFollowed } from "../entity/CatBreedFollowed.entity";
-import { In } from "typeorm";
-import { Order, OrderStatus } from "../entity/Order.entity";
+import { EntityTarget, In, ObjectLiteral } from "typeorm";
+import { Order } from "../entity/Order.entity";
+import { OrderItem, OrderItemStatus } from "../entity/OrderItem.entity";
+import { ShippingService } from "../entity/ShippingService.entity";
+import { PaymentStatus } from "../entity/PaymentMethod.entity";
 
 interface CatQuery extends BaseReqQuery {
   status?: CatStatus;
 }
 
 class CatController {
+  private repository = <T extends ObjectLiteral>(target: EntityTarget<T>) => {
+    return myDataSource.getRepository<T>(target);
+  };
   private catRepostory = myDataSource.getRepository(Cat);
   private catBreedFollowedRepostory =
     myDataSource.getRepository(CatBreedFollowed);
   private orderRepository = myDataSource.getRepository(Order);
+  private orderItemRepository = myDataSource.getRepository(OrderItem);
   private notificationRepository = myDataSource.getRepository(Notification);
 
   public createCat = async (req: Request, res: Response) => {
@@ -53,29 +60,56 @@ class CatController {
     }
   };
 
-  // public buyCat: RequestHandler = async (req, res) => {
-  //   try {
-  //     const { id } = req.user!;
-  //     const { catId } = req.params;
-  //     const { shippingServiceId } = req.body;
+  public buyCat: RequestHandler = async (req, res) => {
+    try {
+      const { id } = req.user!;
+      const { catId } = req.params;
+      const { shippingServiceId, amount, paymentId } = req.body;
 
-  //     const cat = await this.catRepostory.findOne({ where: { id: catId } });
+      await myDataSource.transaction(async (tx) => {
+        const cat = await tx.findOne(Cat, { where: { id: catId } });
 
-  //     if (!cat) {
-  //       return res.status(404).json({ message: "Cat not found" });
-  //     }
+        if (!cat) {
+          return res.status(404).json({ message: "Cat not found" });
+        }
 
-  //     const createOrder = this.orderRepository.create({
-  //       cat,
-  //       user: { id },
-  //       amount: cat.quantity,
-  //       shippingService: { id: shippingServiceId },
-  //       status: OrderStatus.PENDING,
-  //     });
-  //   } catch (error) {
-  //     res.status(500).json({ message: getErrorMessage(error) });
-  //   }
-  // };
+        const shippingService = await tx.findOne(ShippingService, {
+          where: { id: shippingServiceId },
+        });
+
+        if (!shippingService) {
+          return res
+            .status(404)
+            .json({ message: "Shipping service not found" });
+        }
+
+        const orderItem = tx.create(OrderItem, {
+          cat,
+          amount,
+          price: cat.price,
+          shippingService,
+          status: OrderItemStatus.PENDING,
+        });
+
+        const newOrder = tx.create(Order, {
+          user: { id },
+          orderItems: [orderItem],
+          transaction: {
+            buyer: { id },
+            seller: { id: cat.user.id },
+            fee: 2000,
+            payment: { paymentMethod: "BANK", status: PaymentStatus.PENDING },
+            subTotal: cat.price * amount,
+            total: cat.price * amount + 1000,
+          },
+        });
+
+        await tx.save(Order, newOrder);
+      });
+    } catch (error) {
+      res.status(500).json({ message: getErrorMessage(error) });
+    }
+  };
 
   public getCats = async (req: Request, res: Response) => {
     try {
