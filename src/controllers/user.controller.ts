@@ -31,6 +31,8 @@ class UserController {
       const newUser = this.userRepository.create({
         ...rest,
         password: hashedPassword,
+        profile: {},
+        cart: {},
       });
 
       if (usersCount === 0) {
@@ -40,12 +42,9 @@ class UserController {
 
       const savedUser = await this.userRepository.save(newUser);
 
-      const newProfile = this.profileRepository.create({ user: savedUser });
-
-      await this.profileRepository.save(newProfile);
       res
         .status(201)
-        .json({ message: "User created successfully", data: newUser });
+        .json({ message: "User created successfully", data: savedUser });
     } catch (error) {
       res.status(500).json({ message: getErrorMessage(error) });
     }
@@ -56,7 +55,7 @@ class UserController {
       const {
         page = "1",
         limit = "10",
-        order,
+        order = "desc",
         role,
         isOauth,
         isVerified,

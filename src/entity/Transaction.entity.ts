@@ -11,6 +11,9 @@ import { User } from "./User.entity";
 import { Order } from "./Order.entity";
 import { PaymentMethod } from "./PaymentMethod.entity";
 
+import { Transform } from "class-transformer";
+import { ColumnNumericTransformer } from "../utils/columnNumericTransformer";
+
 export enum PaymentStatus {
   PENDING = "PENDING",
   COMPLETED = "COMPLETED",
@@ -38,10 +41,18 @@ export class Transaction {
   })
   status: PaymentStatus;
 
-  @Column({ type: "decimal" })
+  @Column({
+    type: "decimal",
+    default: 0,
+    transformer: new ColumnNumericTransformer(),
+  })
   subTotal: number;
 
-  @Column({ type: "decimal" })
+  @Column({
+    type: "decimal",
+    default: 0,
+    transformer: new ColumnNumericTransformer(),
+  })
   total: number;
 
   @CreateDateColumn()

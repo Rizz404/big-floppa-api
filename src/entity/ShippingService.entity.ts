@@ -7,6 +7,8 @@ import {
   UpdateDateColumn,
 } from "typeorm";
 import { OrderItem } from "./OrderItem.entity";
+import { Transform } from "class-transformer";
+import { ColumnNumericTransformer } from "../utils/columnNumericTransformer";
 
 @Entity()
 export class ShippingService {
@@ -19,7 +21,11 @@ export class ShippingService {
   @Column({ type: "text" })
   description: string;
 
-  @Column({ type: "decimal" })
+  @Column({
+    type: "decimal",
+    default: 0,
+    transformer: new ColumnNumericTransformer(),
+  })
   fee: number;
 
   @Column({ type: "varchar" })

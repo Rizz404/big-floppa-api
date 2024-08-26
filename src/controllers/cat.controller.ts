@@ -13,6 +13,7 @@ import { OrderItem, OrderItemStatus } from "../entity/OrderItem.entity";
 import { ShippingService } from "../entity/ShippingService.entity";
 import { PaymentStatus } from "../entity/Transaction.entity";
 import { PaymentMethod } from "../entity/PaymentMethod.entity";
+import { UserAddress } from "../entity/UserAddress.entity";
 
 interface CatQuery extends BaseReqQuery {
   status?: CatStatus;
@@ -74,8 +75,6 @@ class CatController {
           return res.status(404).json({ message: "Cat not found" });
         }
 
-        console.log(cat);
-
         if (amount > cat.quantity) {
           return res
             .status(400)
@@ -85,8 +84,6 @@ class CatController {
         const shippingService = await tx.findOne(ShippingService, {
           where: { id: shippingServiceId },
         });
-
-        console.log(shippingService);
 
         if (!shippingService) {
           return res
@@ -102,7 +99,15 @@ class CatController {
           return res.status(404).json({ message: "Payment method not found" });
         }
 
-        console.log(paymentMethod);
+        const userAddress = await tx.findOne(UserAddress, {
+          where: { user: { id }, isPrimaryAddress: true },
+        });
+
+        if (!userAddress) {
+          return res
+            .status(404)
+            .json({ message: "User address must be filled first" });
+        }
 
         const orderItem = tx.create(OrderItem, {
           cat,
@@ -110,6 +115,13 @@ class CatController {
           price: cat.price,
           shippingService,
           status: OrderItemStatus.PENDING,
+        });
+
+        console.log("Calculated total:", {
+          subtotal: cat.price * amount,
+          adminFee: 1000,
+          paymentMethodFee: paymentMethod.paymentFee,
+          shippingServiceFee: shippingService.fee,
         });
 
         const newOrder = tx.create(Order, {
@@ -130,6 +142,7 @@ class CatController {
             adminFee: 1000,
             status: PaymentStatus.PENDING,
           },
+          userAddress,
         });
 
         await tx.save(Order, newOrder);

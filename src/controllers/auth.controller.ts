@@ -45,6 +45,8 @@ class AuthController {
       const newUser = this.userRepository.create({
         ...rest,
         password: hashedPassword,
+        profile: {},
+        cart: {},
       });
 
       if (usersCount === 0) {
@@ -54,12 +56,9 @@ class AuthController {
 
       const savedUser = await this.userRepository.save(newUser);
 
-      const newProfile = this.profileRepository.create({ user: savedUser });
-
-      await this.profileRepository.save(newProfile);
       res
         .status(201)
-        .json({ message: "User registered successfully", data: newUser });
+        .json({ message: "User registered successfully", data: savedUser });
     } catch (error) {
       res.status(500).json({ message: getErrorMessage(error) });
     }

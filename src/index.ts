@@ -23,6 +23,8 @@ import socketConfig from "./sockets";
 import { catBreedsFollowedRouter } from "./routes/catBreedFollowed.route";
 import { paymentMethodRouter } from "./routes/paymentMethod.route";
 import { shippingServiceRouter } from "./routes/shippingService.route";
+import { userAddressRouter } from "./routes/userAddress.route";
+import { cartRouter } from "./routes/cart.route";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -74,6 +76,8 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 // * Routes
 app.use("/auth", authRouter);
 app.use("/users", userRouter);
+app.use("/carts", cartRouter);
+app.use("/user-addresses", userAddressRouter);
 app.use("/cats", catRouter);
 app.use("/cat-breeds", catBreedRouter);
 app.use("/cat-breeds-followed", catBreedsFollowedRouter);

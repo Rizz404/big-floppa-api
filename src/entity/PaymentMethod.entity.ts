@@ -7,6 +7,8 @@ import {
   UpdateDateColumn,
 } from "typeorm";
 import { Transaction } from "./Transaction.entity";
+import { Transform } from "class-transformer";
+import { ColumnNumericTransformer } from "../utils/columnNumericTransformer";
 
 @Entity()
 export class PaymentMethod {
@@ -19,7 +21,11 @@ export class PaymentMethod {
   @Column({ type: "text" })
   description: string;
 
-  @Column({ type: "decimal", default: 0 })
+  @Column({
+    type: "decimal",
+    default: 0,
+    transformer: new ColumnNumericTransformer(),
+  })
   paymentFee: number;
 
   @CreateDateColumn()

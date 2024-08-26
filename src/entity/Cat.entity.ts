@@ -14,6 +14,8 @@ import { CatPicture } from "./CatPicture.entity";
 import { CatBreed } from "./CatBreed.entity";
 import { CartItem } from "./CartItem.entity";
 import { OrderItem } from "./OrderItem.entity";
+import { Transform } from "class-transformer";
+import { ColumnNumericTransformer } from "../utils/columnNumericTransformer";
 
 export enum CatStatus {
   AVAILABLE = "AVAILABLE",
@@ -45,7 +47,11 @@ export class Cat {
   @Column({ type: "text" })
   description: string;
 
-  @Column({ type: "decimal" })
+  @Column({
+    type: "decimal",
+    default: 0,
+    transformer: new ColumnNumericTransformer(),
+  })
   price: number;
 
   @Column({ type: "int", default: 1 })

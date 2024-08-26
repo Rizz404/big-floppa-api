@@ -9,6 +9,8 @@ import {
 import { ShippingService } from "./ShippingService.entity";
 import { Cat } from "./Cat.entity";
 import { Order } from "./Order.entity";
+import { Transform } from "class-transformer";
+import { ColumnNumericTransformer } from "../utils/columnNumericTransformer";
 
 export enum OrderItemStatus {
   PENDING = "PENDING",
@@ -36,7 +38,11 @@ export class OrderItem {
   @Column({ type: "int", default: 1 })
   amount: number;
 
-  @Column({ type: "decimal" })
+  @Column({
+    type: "decimal",
+    default: 0,
+    transformer: new ColumnNumericTransformer(),
+  })
   price: number;
 
   @ManyToOne(
