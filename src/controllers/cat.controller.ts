@@ -11,7 +11,8 @@ import { EntityTarget, In, ObjectLiteral } from "typeorm";
 import { Order } from "../entity/Order.entity";
 import { OrderItem, OrderItemStatus } from "../entity/OrderItem.entity";
 import { ShippingService } from "../entity/ShippingService.entity";
-import { PaymentStatus } from "../entity/PaymentMethod.entity";
+import { PaymentStatus } from "../entity/Transaction.entity";
+import { PaymentMethod } from "../entity/PaymentMethod.entity";
 
 interface CatQuery extends BaseReqQuery {
   status?: CatStatus;
@@ -24,15 +25,14 @@ class CatController {
   private catRepostory = myDataSource.getRepository(Cat);
   private catBreedFollowedRepostory =
     myDataSource.getRepository(CatBreedFollowed);
-  private orderRepository = myDataSource.getRepository(Order);
-  private orderItemRepository = myDataSource.getRepository(OrderItem);
   private notificationRepository = myDataSource.getRepository(Notification);
 
   public createCat = async (req: Request, res: Response) => {
     try {
+      const { id } = req.user!;
       const catData: Partial<Cat> = req.body;
 
-      const newCat = this.catRepostory.create(catData);
+      const newCat = this.catRepostory.create({ user: { id }, ...catData });
 
       await this.catRepostory.save(newCat);
 
@@ -40,8 +40,6 @@ class CatController {
         where: { catBreed: { id: catData.catBreed?.id } },
         relations: { user: true, catBreed: true },
       });
-
-      console.log(userFollowedBreeds);
 
       const newCatNotification = this.notificationRepository.create({
         message: "Cat created",
@@ -64,24 +62,47 @@ class CatController {
     try {
       const { id } = req.user!;
       const { catId } = req.params;
-      const { shippingServiceId, amount, paymentId } = req.body;
+      const { shippingServiceId, paymentMethodId, amount = 1 } = req.body;
 
-      await myDataSource.transaction(async (tx) => {
-        const cat = await tx.findOne(Cat, { where: { id: catId } });
+      const createOrder = await myDataSource.transaction(async (tx) => {
+        const cat = await tx.findOne(Cat, {
+          where: { id: catId },
+          relations: { user: true },
+        });
 
         if (!cat) {
           return res.status(404).json({ message: "Cat not found" });
+        }
+
+        console.log(cat);
+
+        if (amount > cat.quantity) {
+          return res
+            .status(400)
+            .json({ message: "Amount can't greater than quantity of cat" });
         }
 
         const shippingService = await tx.findOne(ShippingService, {
           where: { id: shippingServiceId },
         });
 
+        console.log(shippingService);
+
         if (!shippingService) {
           return res
             .status(404)
             .json({ message: "Shipping service not found" });
         }
+
+        const paymentMethod = await tx.findOne(PaymentMethod, {
+          where: { id: paymentMethodId },
+        });
+
+        if (!paymentMethod) {
+          return res.status(404).json({ message: "Payment method not found" });
+        }
+
+        console.log(paymentMethod);
 
         const orderItem = tx.create(OrderItem, {
           cat,
@@ -97,15 +118,24 @@ class CatController {
           transaction: {
             buyer: { id },
             seller: { id: cat.user.id },
-            fee: 2000,
-            payment: { paymentMethod: "BANK", status: PaymentStatus.PENDING },
             subTotal: cat.price * amount,
-            total: cat.price * amount + 1000,
+            total:
+              cat.price * amount +
+              1000 +
+              paymentMethod.paymentFee +
+              shippingService.fee,
+            paymentMethod,
+            paymentMethodFee: paymentMethod.paymentFee,
+            shippingServiceFee: shippingService.fee,
+            adminFee: 1000,
+            status: PaymentStatus.PENDING,
           },
         });
 
         await tx.save(Order, newOrder);
+        return newOrder;
       });
+      res.json({ message: "Cat ordered", data: createOrder });
     } catch (error) {
       res.status(500).json({ message: getErrorMessage(error) });
     }
@@ -128,6 +158,16 @@ class CatController {
         skip,
         order: { createdAt: order },
         relations: { user: true, catBreed: true, catPictures: true },
+        select: {
+          user: {
+            id: true,
+            username: true,
+            email: true,
+            profile: { profilePicture: true },
+          },
+          catBreed: { id: true, name: true, description: true, image: true },
+          catPictures: { url: true },
+        },
       });
 
       const response = paginatedResponse(cats, +page, +limit, totalData);

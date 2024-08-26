@@ -29,7 +29,7 @@ export class Cat {
   @ManyToOne(() => User, (user) => user.cats)
   user: User;
 
-  @ManyToOne(() => CatBreed, (catBreed) => catBreed.cats)
+  @ManyToOne(() => CatBreed, (catBreed) => catBreed.cats, { cascade: true })
   catBreed: CatBreed;
 
   @Index()
@@ -60,7 +60,9 @@ export class Cat {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToMany(() => CatPicture, (catPicture) => catPicture.cat)
+  @OneToMany(() => CatPicture, (catPicture) => catPicture.cat, {
+    cascade: true,
+  })
   catPictures: CatPicture[];
 
   @OneToMany(() => CartItem, (cartItem) => cartItem.cat)

@@ -25,6 +25,12 @@ export class Transaction {
   @Column({ type: "decimal", default: 0 })
   adminFee: number;
 
+  @Column({ type: "decimal", default: 0 })
+  paymentMethodFee: number;
+
+  @Column({ type: "decimal", default: 0 })
+  shippingServiceFee: number;
+
   @Column({
     type: "enum",
     enum: PaymentStatus,

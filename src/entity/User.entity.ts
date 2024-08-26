@@ -70,14 +70,16 @@ export class User {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToMany(() => UserAddress, (userAddres) => userAddres.user)
+  @OneToMany(() => UserAddress, (userAddres) => userAddres.user, {
+    cascade: true,
+  })
   userAddreses: UserAddress[];
 
   // * Relasi one to one begini
-  @OneToOne(() => Profile, (profile) => profile.user)
+  @OneToOne(() => Profile, (profile) => profile.user, { cascade: true })
   profile: Profile;
 
-  @OneToOne(() => Cart, (cart) => cart.user)
+  @OneToOne(() => Cart, (cart) => cart.user, { cascade: true })
   cart: Cart;
 
   @OneToMany(() => Cat, (cat) => cat.user)

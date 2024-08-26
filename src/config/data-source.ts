@@ -10,7 +10,7 @@ const myDataSource = new DataSource({
   entities: [__dirname + "/../entity/*.ts"],
   migrations: [__dirname + "/../migration/*.ts"],
   // synchronize: process.env.NODE_ENV === "development" ? true : false,
-  logging: process.env.NODE_ENV === "development" ? true : false,
+  // logging: process.env.NODE_ENV === "development" ? true : false,
   subscribers: [],
 });
 

@@ -22,6 +22,9 @@ export class ShippingService {
   @Column({ type: "decimal" })
   fee: number;
 
+  @Column({ type: "varchar" })
+  estimationTime: string;
+
   @CreateDateColumn()
   createdAt: Date;
 

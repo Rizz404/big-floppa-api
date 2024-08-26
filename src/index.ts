@@ -21,6 +21,8 @@ import allowedOrigins from "./config/allowedOrigins";
 import { Server } from "socket.io";
 import socketConfig from "./sockets";
 import { catBreedsFollowedRouter } from "./routes/catBreedFollowed.route";
+import { paymentMethodRouter } from "./routes/paymentMethod.route";
+import { shippingServiceRouter } from "./routes/shippingService.route";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -75,6 +77,8 @@ app.use("/users", userRouter);
 app.use("/cats", catRouter);
 app.use("/cat-breeds", catBreedRouter);
 app.use("/cat-breeds-followed", catBreedsFollowedRouter);
+app.use("/payment-methods", paymentMethodRouter);
+app.use("/shipping-services", shippingServiceRouter);
 
 // * Socket io config
 socketConfig(io);

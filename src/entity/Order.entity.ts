@@ -19,13 +19,17 @@ export class Order {
   @ManyToOne(() => User, (user) => user.orders)
   user: User;
 
-  @ManyToOne(() => Transaction, (transaction) => transaction.orders)
+  @ManyToOne(() => Transaction, (transaction) => transaction.orders, {
+    cascade: true,
+  })
   transaction: Transaction;
 
-  @ManyToOne(() => UserAddress, (userAddress) => userAddress.orders)
+  @ManyToOne(() => UserAddress, (userAddress) => userAddress.orders, {
+    cascade: true,
+  })
   userAddress: UserAddress;
 
-  @OneToMany(() => OrderItem, (orderItem) => orderItem.order)
+  @OneToMany(() => OrderItem, (orderItem) => orderItem.order, { cascade: true })
   orderItems: OrderItem[];
 
   @CreateDateColumn()

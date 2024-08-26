@@ -8,6 +8,7 @@ router
   .route("/")
   .get(catController.getCats)
   .post(auth, catController.createCat);
+router.post("/buy/:catId", auth, catController.buyCat);
 router
   .route("/:catId")
   .get(catController.getCatById)
