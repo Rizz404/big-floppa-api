@@ -39,7 +39,9 @@ const processAndSaveImage = async (
   folder: string
 ) => {
   const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-  const filename = file.fieldname + "-" + uniqueSuffix + ".webp";
+  const imageExt = file.mimetype === "image/gif" ? ".gif" : ".webp";
+
+  const filename = file.fieldname + "-" + uniqueSuffix + imageExt;
   const filepath = path.join(
     __dirname,
     "..",
@@ -50,12 +52,23 @@ const processAndSaveImage = async (
   );
 
   // * Pakai sharp untuk kompres image
-  await sharp(file.buffer)
-    .webp({ quality: 80 })
-    .resize(1000, 1000, { fit: "inside", withoutEnlargement: true }) // * // Resize jika lebih besar dari 1000x1000
-    .toFile(filepath);
+  if (file.mimetype === "image/gif") {
+    // todo: Gif nya kaga gerak mas
+    await sharp(file.buffer)
+      .gif({ progressive: true })
+      .resize(1000, 1000, { fit: "inside", withoutEnlargement: true })
+      .toFile(filepath);
+  } else {
+    await sharp(file.buffer)
+      .webp({ quality: 80 })
+      .resize(1000, 1000, { fit: "inside", withoutEnlargement: true }) // * // Resize jika lebih besar dari 1000x1000
+      .toFile(filepath);
+  }
 
-  return generateFileUrl(folder, filename);
+  const fileUrl = generateFileUrl(folder, filename);
+  const destination = path.join("public", "images", folder);
+
+  return { fileUrl, filename, path: filepath, destination };
 };
 
 const fileFilter = (
@@ -88,21 +101,31 @@ const handleUpload = (uploadFn: any, folder: string) => {
 
       if (req.file) {
         try {
-          req.file.fileUrl = await processAndSaveImage(req.file, folder);
+          const processed = await processAndSaveImage(req.file, folder);
+
+          req.file.fileUrl = processed.fileUrl;
+          req.file.filename = processed.filename;
+          req.file.path = processed.path;
+          req.file.destination = processed.destination;
         } catch (error) {
           return res.status(500).json({ error: "Error processing image" });
         }
       } else if (req.files) {
-        const processPromises = Object.values(req.files).flatMap(
-          (file: Express.Multer.File) => {
-            processAndSaveImage(file, folder).then((fileUrl) => {
-              file.fileUrl = fileUrl;
-            });
-          }
-        );
+        const filesArray = Object.values(req.files).flat();
 
         try {
-          await Promise.all(processPromises);
+          const processedFiles = await Promise.all(
+            filesArray.map((file: Express.Multer.File) =>
+              processAndSaveImage(file, folder)
+            )
+          );
+
+          filesArray.forEach((file: Express.Multer.File, index) => {
+            file.fileUrl = processedFiles[index].fileUrl;
+            file.filename = processedFiles[index].filename;
+            file.path = processedFiles[index].path;
+            file.destination = processedFiles[index].destination;
+          });
         } catch (error) {
           return res.status(500).json({ error: "Error processing image" });
         }

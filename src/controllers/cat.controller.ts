@@ -15,18 +15,17 @@ import { PaymentStatus } from "../entity/Transaction.entity";
 import { PaymentMethod } from "../entity/PaymentMethod.entity";
 import { UserAddress } from "../entity/UserAddress.entity";
 import { CatPicture } from "../entity/CatPicture.entity";
+import { UserRole } from "../entity/User.entity";
 
 interface CatQuery extends BaseReqQuery {
   status?: CatStatus;
 }
 
 class CatController {
-  private repository = <T extends ObjectLiteral>(target: EntityTarget<T>) => {
-    return myDataSource.getRepository<T>(target);
-  };
   private catRepostory = myDataSource.getRepository(Cat);
   private catBreedFollowedRepostory =
     myDataSource.getRepository(CatBreedFollowed);
+  private catPictureRepositori = myDataSource.getRepository(CatPicture);
   private notificationRepository = myDataSource.getRepository(Notification);
 
   public createCat = async (req: Request, res: Response) => {
@@ -46,11 +45,11 @@ class CatController {
           fileUrl,
         }): Partial<CatPicture> => ({
           mimetype,
-          originalname,
-          path,
-          size,
-          url: fileUrl,
-          destination,
+          originalname: originalname || "",
+          path: path || "",
+          size: size || 0,
+          url: fileUrl || "",
+          destination: destination || "",
           fieldname,
           filename,
         })
@@ -247,8 +246,29 @@ class CatController {
 
   public updateCatById = async (req: Request, res: Response) => {
     try {
+      const { id, role } = req.user!;
       const { catId } = req.params;
-      const catData: Cat = req.body;
+      const catData: Omit<
+        Cat,
+        | "id"
+        | "createdAt"
+        | "updatedAt"
+        | "catPictures"
+        | "cartItems"
+        | "orderItems"
+      > = req.body;
+
+      const cat = await this.catRepostory.findOne({ where: { id: catId } });
+
+      if (!cat) {
+        return res.status(404).json({ message: "Cat not found" });
+      }
+
+      if (cat.user.id !== id || role !== UserRole.ADMIN) {
+        return res
+          .status(401)
+          .json({ message: "You don't have permission to update this cat" });
+      }
 
       await this.catRepostory.update(catId, catData);
 
@@ -272,6 +292,44 @@ class CatController {
       }
 
       res.json({ message: "Cat updated", data: updatedCat });
+    } catch (error) {
+      res.status(500).json({ message: getErrorMessage(error) });
+    }
+  };
+
+  public addCatPictures: RequestHandler = async (req, res) => {
+    try {
+      const { catId } = req.params;
+      const files = req.files as Express.Multer.File[];
+
+      const catPictures = files?.map(
+        ({
+          mimetype,
+          originalname,
+          path,
+          size,
+          filename,
+          destination,
+          fieldname,
+          fileUrl,
+        }): Partial<CatPicture> => ({
+          mimetype,
+          originalname,
+          path,
+          size,
+          url: fileUrl,
+          destination,
+          fieldname,
+          filename,
+          // @ts-expect-error
+          cat: catId,
+        })
+      );
+
+      const newCatPictures = this.catPictureRepositori.create(catPictures);
+
+      await this.catPictureRepositori.save(newCatPictures);
+      res.json({ message: "Cat pictures added", data: newCatPictures });
     } catch (error) {
       res.status(500).json({ message: getErrorMessage(error) });
     }
