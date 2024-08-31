@@ -11,6 +11,7 @@ import { auth } from "../middleware/auth.middleware";
 import validateDto from "../middleware/dto.validation.middleware";
 import roleAccess from "../middleware/role.access.middleware";
 import express from "express";
+import { uploadSingle } from "../middleware/upload.file.middleware";
 
 const router = express.Router();
 
@@ -36,6 +37,7 @@ router
   .patch(
     auth,
     validateDto("body", UpdateUserDto),
+    uploadSingle("profilePicture", "user"),
     userController.updateUserProfile
   );
 router.patch(

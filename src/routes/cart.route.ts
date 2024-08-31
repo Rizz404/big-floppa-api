@@ -10,8 +10,9 @@ router
   .route("/user")
   .get(auth, cartController.getUserCartItems)
   .post(auth, cartController.addCartItemToCart);
+router.post("/user/checkout", auth, cartController.cartCheckout);
 router
-  .route("/:cartItemId")
+  .route("/cartItems/:cartItemId")
   .patch(auth, cartController.updateCartItemById)
   .delete(auth, cartController.deleteCartItemById);
 

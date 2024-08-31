@@ -25,6 +25,7 @@ import { paymentMethodRouter } from "./routes/paymentMethod.route";
 import { shippingServiceRouter } from "./routes/shippingService.route";
 import { userAddressRouter } from "./routes/userAddress.route";
 import { cartRouter } from "./routes/cart.route";
+import path from "path";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -51,9 +52,11 @@ app.use(
 );
 app.use(helmet());
 app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
+app.use("/public", express.static(path.join(__dirname, "public")));
 app.use(morgan("dev"));
 app.use(passport.initialize());
 app.use(passport.session());
+
 jwtStrategy(passport);
 googleOauth2Strategy(passport);
 localStrategy(passport);

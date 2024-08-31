@@ -14,6 +14,7 @@ import { ShippingService } from "../entity/ShippingService.entity";
 import { PaymentStatus } from "../entity/Transaction.entity";
 import { PaymentMethod } from "../entity/PaymentMethod.entity";
 import { UserAddress } from "../entity/UserAddress.entity";
+import { CatPicture } from "../entity/CatPicture.entity";
 
 interface CatQuery extends BaseReqQuery {
   status?: CatStatus;
@@ -32,8 +33,34 @@ class CatController {
     try {
       const { id } = req.user!;
       const catData: Partial<Cat> = req.body;
+      const files = req.files as Express.Multer.File[];
+      const catPictures = files?.map(
+        ({
+          mimetype,
+          originalname,
+          path,
+          size,
+          filename,
+          destination,
+          fieldname,
+          fileUrl,
+        }): Partial<CatPicture> => ({
+          mimetype,
+          originalname,
+          path,
+          size,
+          url: fileUrl,
+          destination,
+          fieldname,
+          filename,
+        })
+      );
 
-      const newCat = this.catRepostory.create({ user: { id }, ...catData });
+      const newCat = this.catRepostory.create({
+        user: { id },
+        ...(files && files.length !== 0 && { catPictures }),
+        ...catData,
+      });
 
       await this.catRepostory.save(newCat);
 
@@ -196,6 +223,16 @@ class CatController {
       const cat = await this.catRepostory.findOne({
         where: { id: catId },
         relations: { user: true, catBreed: true, catPictures: true },
+        select: {
+          user: {
+            id: true,
+            username: true,
+            email: true,
+            profile: { profilePicture: true },
+          },
+          catBreed: { id: true, name: true, description: true, image: true },
+          catPictures: { url: true },
+        },
       });
 
       if (!cat) {
@@ -218,6 +255,16 @@ class CatController {
       const updatedCat = await this.catRepostory.findOne({
         where: { id: catId },
         relations: { user: true, catBreed: true, catPictures: true },
+        select: {
+          user: {
+            id: true,
+            username: true,
+            email: true,
+            profile: { profilePicture: true },
+          },
+          catBreed: { id: true, name: true, description: true, image: true },
+          catPictures: { url: true },
+        },
       });
 
       if (!updatedCat) {

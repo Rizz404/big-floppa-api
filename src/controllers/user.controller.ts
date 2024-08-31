@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
-
 import myDataSource from "../config/data-source";
 import getErrorMessage from "../utils/getErrorMessage";
 import { User, UserRole } from "../entity/User.entity";
@@ -8,6 +7,8 @@ import { Profile } from "../entity/Profile.entity";
 import { RequestHandler } from "express-serve-static-core";
 import BaseReqQuery from "../helpers/base.req.query.type";
 import paginatedResponse from "../utils/paginatedResponse";
+import path from "path";
+import fs from "fs";
 
 interface UserQuery extends BaseReqQuery {
   role?: UserRole;
@@ -104,19 +105,48 @@ class UserController {
         email,
         firstname,
         lastname,
-        profilePicture,
         gender,
         age,
         phoneNumber,
         bio,
       }: Partial<User> & Partial<Profile> = req.body;
+      const file = req.file;
+
+      const user = await this.userRepository.findOne({
+        where: { id },
+        relations: { profile: true },
+      });
+
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      if (user.profile) {
+        if (file?.fileUrl) {
+          // Hapus file lama jika ada
+          if (user.profile.profilePicture) {
+            const oldFilePath = path.join(
+              __dirname,
+              "..",
+              "public",
+              user.profile.profilePicture.replace(
+                `${process.env.BACKEND_DOMAIN}`,
+                ""
+              )
+            );
+            fs.unlink(oldFilePath, (err) => {
+              if (err) console.error("Error deleting old file:", err);
+            });
+          }
+        }
+      }
 
       await this.userRepository.update(id, { username, email });
 
       await this.profileRepository.update(profile.id, {
         firstname,
         lastname,
-        profilePicture,
+        ...(file && file.fileUrl && { profilePicture: file.fileUrl }),
         gender,
         age,
         phoneNumber,
