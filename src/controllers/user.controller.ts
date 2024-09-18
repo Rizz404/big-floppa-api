@@ -9,6 +9,7 @@ import BaseReqQuery from "../helpers/base.req.query.type";
 import paginatedResponse from "../utils/paginatedResponse";
 import path from "path";
 import fs from "fs";
+import deleteFile from "../utils/deleteFile";
 
 interface UserQuery extends BaseReqQuery {
   role?: UserRole;
@@ -121,24 +122,8 @@ class UserController {
         return res.status(404).json({ message: "User not found" });
       }
 
-      if (user.profile) {
-        if (file?.fileUrl) {
-          // Hapus file lama jika ada
-          if (user.profile.profilePicture) {
-            const oldFilePath = path.join(
-              __dirname,
-              "..",
-              "public",
-              user.profile.profilePicture.replace(
-                `${process.env.BACKEND_DOMAIN}`,
-                ""
-              )
-            );
-            fs.unlink(oldFilePath, (err) => {
-              if (err) console.error("Error deleting old file:", err);
-            });
-          }
-        }
+      if (user.profile && file && file.fileUrl && user.profile.profilePicture) {
+        deleteFile(user.profile.profilePicture);
       }
 
       await this.userRepository.update(id, { username, email });
@@ -242,6 +227,20 @@ class UserController {
   public deleteUserById = async (req: Request, res: Response) => {
     try {
       const { userId } = req.params;
+
+      const user = await this.userRepository.findOne({
+        where: { id: userId },
+        relations: { profile: true },
+      });
+
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      if (user.profile.profilePicture) {
+        await deleteFile(user.profile.profilePicture);
+      }
+
       const deletedUser = await this.userRepository.delete(userId);
 
       res.json({ message: "User deleted", data: deletedUser });

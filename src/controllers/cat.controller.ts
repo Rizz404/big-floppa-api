@@ -16,13 +16,15 @@ import { PaymentMethod } from "../entity/PaymentMethod.entity";
 import { UserAddress } from "../entity/UserAddress.entity";
 import { CatPicture } from "../entity/CatPicture.entity";
 import { UserRole } from "../entity/User.entity";
+import path from "path";
+import deleteFile from "../utils/deleteFile";
 
 interface CatQuery extends BaseReqQuery {
   status?: CatStatus;
 }
 
 class CatController {
-  private catRepostory = myDataSource.getRepository(Cat);
+  private catRepository = myDataSource.getRepository(Cat);
   private catBreedFollowedRepostory =
     myDataSource.getRepository(CatBreedFollowed);
   private catPictureRepositori = myDataSource.getRepository(CatPicture);
@@ -45,23 +47,23 @@ class CatController {
           fileUrl,
         }): Partial<CatPicture> => ({
           mimetype,
-          originalname: originalname || "",
-          path: path || "",
-          size: size || 0,
-          url: fileUrl || "",
-          destination: destination || "",
+          originalname,
+          path,
+          size,
+          url: fileUrl,
+          destination,
           fieldname,
           filename,
         })
       );
 
-      const newCat = this.catRepostory.create({
+      const newCat = this.catRepository.create({
         user: { id },
         ...(files && files.length !== 0 && { catPictures }),
         ...catData,
       });
 
-      await this.catRepostory.save(newCat);
+      await this.catRepository.save(newCat);
 
       const userFollowedBreeds = await this.catBreedFollowedRepostory.find({
         where: { catBreed: { id: catData.catBreed?.id } },
@@ -81,6 +83,44 @@ class CatController {
       res.status(201).json({ message: "Cat created", data: newCat });
     } catch (error) {
       // todo: Buat type error
+      res.status(500).json({ message: getErrorMessage(error) });
+    }
+  };
+
+  public addCatPictures: RequestHandler = async (req, res) => {
+    try {
+      const { catId } = req.params;
+      const files = req.files as Express.Multer.File[];
+
+      const catPictures = files?.map(
+        ({
+          mimetype,
+          originalname,
+          path,
+          size,
+          filename,
+          destination,
+          fieldname,
+          fileUrl,
+        }): Partial<CatPicture> => ({
+          mimetype,
+          originalname,
+          path,
+          size,
+          url: fileUrl,
+          destination,
+          fieldname,
+          filename,
+          // @ts-expect-error
+          cat: catId,
+        })
+      );
+
+      const newCatPictures = this.catPictureRepositori.create(catPictures);
+
+      await this.catPictureRepositori.save(newCatPictures);
+      res.json({ message: "Cat pictures added", data: newCatPictures });
+    } catch (error) {
       res.status(500).json({ message: getErrorMessage(error) });
     }
   };
@@ -143,13 +183,6 @@ class CatController {
           status: OrderItemStatus.PENDING,
         });
 
-        console.log("Calculated total:", {
-          subtotal: cat.price * amount,
-          adminFee: 1000,
-          paymentMethodFee: paymentMethod.paymentFee,
-          shippingServiceFee: shippingService.fee,
-        });
-
         const newOrder = tx.create(Order, {
           user: { id },
           orderItems: [orderItem],
@@ -190,8 +223,8 @@ class CatController {
       } = req.query as unknown as CatQuery;
       const skip = (+page - 1) * +limit;
 
-      const totalData = await this.catRepostory.count({ where: { status } });
-      const cats = await this.catRepostory.find({
+      const totalData = await this.catRepository.count({ where: { status } });
+      const cats = await this.catRepository.find({
         where: { status },
         take: +limit,
         skip,
@@ -205,6 +238,7 @@ class CatController {
             profile: { profilePicture: true },
           },
           catBreed: { id: true, name: true, description: true, image: true },
+          // todo: Munculnya kenapa cuma satu
           catPictures: { url: true },
         },
       });
@@ -219,7 +253,7 @@ class CatController {
   public getCatById = async (req: Request, res: Response) => {
     try {
       const { catId } = req.params;
-      const cat = await this.catRepostory.findOne({
+      const cat = await this.catRepository.findOne({
         where: { id: catId },
         relations: { user: true, catBreed: true, catPictures: true },
         select: {
@@ -258,7 +292,7 @@ class CatController {
         | "orderItems"
       > = req.body;
 
-      const cat = await this.catRepostory.findOne({ where: { id: catId } });
+      const cat = await this.catRepository.findOne({ where: { id: catId } });
 
       if (!cat) {
         return res.status(404).json({ message: "Cat not found" });
@@ -270,9 +304,9 @@ class CatController {
           .json({ message: "You don't have permission to update this cat" });
       }
 
-      await this.catRepostory.update(catId, catData);
+      await this.catRepository.update(catId, catData);
 
-      const updatedCat = await this.catRepostory.findOne({
+      const updatedCat = await this.catRepository.findOne({
         where: { id: catId },
         relations: { user: true, catBreed: true, catPictures: true },
         select: {
@@ -297,50 +331,77 @@ class CatController {
     }
   };
 
-  public addCatPictures: RequestHandler = async (req, res) => {
+  public deleteCatById = async (req: Request, res: Response) => {
     try {
+      const { id, role } = req.user!;
       const { catId } = req.params;
-      const files = req.files as Express.Multer.File[];
+      const cat = await this.catRepository.findOne({
+        where: { id: catId },
+        relations: { catPictures: true },
+      });
 
-      const catPictures = files?.map(
-        ({
-          mimetype,
-          originalname,
-          path,
-          size,
-          filename,
-          destination,
-          fieldname,
-          fileUrl,
-        }): Partial<CatPicture> => ({
-          mimetype,
-          originalname,
-          path,
-          size,
-          url: fileUrl,
-          destination,
-          fieldname,
-          filename,
-          // @ts-expect-error
-          cat: catId,
-        })
-      );
+      if (!cat) {
+        return res.status(404).json({ message: "Cat not found" });
+      }
 
-      const newCatPictures = this.catPictureRepositori.create(catPictures);
+      if (cat.user.id !== id || role !== UserRole.ADMIN) {
+        return res
+          .status(401)
+          .json({ message: "You don't have permission to delete this cat" });
+      }
 
-      await this.catPictureRepositori.save(newCatPictures);
-      res.json({ message: "Cat pictures added", data: newCatPictures });
+      if (cat.catPictures) {
+        for (const catPicture of cat.catPictures) {
+          await this.catPictureRepositori.delete(catPicture.id);
+          await deleteFile(catPicture.url);
+        }
+      }
+
+      const deletedCat = await this.catRepository.delete(catId);
+
+      res.json({ message: "Cat deleted", data: deletedCat });
     } catch (error) {
       res.status(500).json({ message: getErrorMessage(error) });
     }
   };
 
-  public deleteCatById = async (req: Request, res: Response) => {
+  public deleteCatPicturesById: RequestHandler = async (req, res) => {
     try {
+      const { id, role } = req.user!;
       const { catId } = req.params;
-      const deletedCat = await this.catRepostory.delete(catId);
+      const { catPictureIds }: { catPictureIds: string[] } = req.body;
 
-      res.json({ message: "Cat deleted", data: deletedCat });
+      const cat = await this.catRepository.findOne({
+        where: { id: catId },
+        relations: { catPictures: true, user: true },
+      });
+
+      if (catPictureIds.length <= 0) {
+        return res.status(404).json({ message: "Cat ids can't be empty" });
+      }
+
+      if (!cat) {
+        return res.status(404).json({ message: "Cat not found" });
+      }
+
+      if (cat.user.id !== id || role !== UserRole.ADMIN) {
+        return res.status(401).json({
+          message: "You don't have permission to delete cat pictures",
+        });
+      }
+
+      const deletedCatPictures = cat.catPictures.filter((catPicture) =>
+        catPictureIds.includes(catPicture.id)
+      );
+
+      for (const deletedCatPicture of deletedCatPictures) {
+        if (cat.catPictures && deletedCatPictures.length > 0) {
+          await this.catPictureRepositori.delete(deletedCatPicture.id);
+          await deleteFile(deletedCatPicture.url);
+        }
+      }
+
+      res.json({ message: "Cat pictures deleted" });
     } catch (error) {
       res.status(500).json({ message: getErrorMessage(error) });
     }

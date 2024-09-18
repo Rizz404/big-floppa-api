@@ -26,6 +26,8 @@ import { shippingServiceRouter } from "./routes/shippingService.route";
 import { userAddressRouter } from "./routes/userAddress.route";
 import { cartRouter } from "./routes/cart.route";
 import path from "path";
+import { orderRouter } from "./routes/order.route";
+import { transactionRouter } from "./routes/transaction.route";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -86,6 +88,8 @@ app.use("/cat-breeds", catBreedRouter);
 app.use("/cat-breeds-followed", catBreedsFollowedRouter);
 app.use("/payment-methods", paymentMethodRouter);
 app.use("/shipping-services", shippingServiceRouter);
+app.use("/orders", orderRouter);
+app.use("/transactions", transactionRouter);
 
 // * Socket io config
 socketConfig(io);
@@ -98,10 +102,35 @@ myDataSource
       console.log(`Server running on port ${PORT}`);
     });
     console.log("Data Source has been initialized!");
+
+    // * Untuk shutdown gracfully
+    process.on("SIGTERM", shutDown);
+    process.on("SIGINT", shutDown);
   })
   .catch((err) => {
     console.error("Error during Data Source initialization:", err);
     process.exit(1);
   });
+
+function shutDown() {
+  console.log("Received kill signal, shutting down gracefully");
+  server.close(() => {
+    console.log("Closed out remaining connections");
+    process.exit(0);
+  });
+
+  setTimeout(() => {
+    console.error(
+      "Could not close connections in time, forcefully shutting down"
+    );
+    process.exit(1);
+  }, 10000);
+
+  if (io) {
+    io.close(() => {
+      console.log("Closed socket connections");
+    });
+  }
+}
 
 export default app;

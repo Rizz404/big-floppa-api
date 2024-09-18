@@ -10,14 +10,11 @@ router
   .route("/")
   .get(userAddressController.getUserAddresss)
   .post(auth, userAddressController.createUserAddress);
+router.get("/user", auth, userAddressController.getUserAddressesByUser);
 router
   .route("/:userAddressId")
   .get(userAddressController.getUserAddressById)
-  .patch(
-    auth,
-    roleAccess(UserRole.ADMIN),
-    userAddressController.updateUserAddressById
-  )
+  .patch(auth, userAddressController.updateUserAddressById)
   .delete(
     auth,
     roleAccess(UserRole.ADMIN),

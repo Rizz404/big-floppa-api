@@ -10,12 +10,14 @@ router
   .get(catController.getCats)
   .post(auth, uploadArray("catPictures", 7, "cat"), catController.createCat);
 router.post("/buy/:catId", auth, catController.buyCat);
-router.post(
-  "/pictures/:catId",
-  auth,
-  uploadArray("catPictures", 7, "cat"),
-  catController.addCatPictures
-);
+router
+  .route("/pictures/:catId")
+  .post(
+    auth,
+    uploadArray("catPictures", 7, "cat"),
+    catController.addCatPictures
+  )
+  .delete(auth, catController.deleteCatPicturesById);
 router
   .route("/:catId")
   .get(catController.getCatById)

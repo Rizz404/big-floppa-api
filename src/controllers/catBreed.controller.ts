@@ -6,6 +6,7 @@ import BaseReqQuery from "../helpers/base.req.query.type";
 import paginatedResponse from "../utils/paginatedResponse";
 import { Notification, NotificationType } from "../entity/Notification.entity";
 import { sendNotification } from "../sockets/notificationHandler";
+import deleteFile from "../utils/deleteFile";
 
 interface BreedQuery extends BaseReqQuery {}
 
@@ -17,9 +18,11 @@ class CatBreedController {
     try {
       const { id } = req.user!;
       const catBreedData: Partial<CatBreed> = req.body;
+      const file = req.file;
 
       const newCatBreed = this.catBreedRepostory.create({
         author: { id },
+        ...(file && { image: file.fileUrl }),
         ...catBreedData,
       });
 
@@ -35,7 +38,7 @@ class CatBreedController {
 
       sendNotification(req.io, newBreedNotification);
 
-      res.status(201).json({ message: "Cat race created", data: newCatBreed });
+      res.status(201).json({ message: "Cat breed created", data: newCatBreed });
     } catch (error) {
       // todo: Buat type error
       res.status(500).json({ message: getErrorMessage(error) });
@@ -76,7 +79,7 @@ class CatBreedController {
       });
 
       if (!catBreed) {
-        return res.status(404).json({ message: "Cat race not found" });
+        return res.status(404).json({ message: "Cat breed not found" });
       }
 
       res.json(catBreed);
@@ -89,10 +92,12 @@ class CatBreedController {
     try {
       const { id } = req.user!;
       const { catBreedId } = req.params;
+      const file = req.file;
       const catBreedData: Omit<CatBreed, "author"> = req.body;
 
       await this.catBreedRepostory.update(catBreedId, {
         author: { id },
+        ...(file && { image: file.fileUrl }),
         ...catBreedData,
       });
 
@@ -102,10 +107,10 @@ class CatBreedController {
       });
 
       if (!updatedCatBreed) {
-        return res.status(404).json({ message: "Cat race not found" });
+        return res.status(404).json({ message: "Cat breed not found" });
       }
 
-      res.json({ message: "Cat race updated", data: updatedCatBreed });
+      res.json({ message: "Cat breed updated", data: updatedCatBreed });
     } catch (error) {
       res.status(500).json({ message: getErrorMessage(error) });
     }
@@ -114,9 +119,22 @@ class CatBreedController {
   public deleteCatBreedById = async (req: Request, res: Response) => {
     try {
       const { catBreedId } = req.params;
+
+      const catBreed = await this.catBreedRepostory.findOne({
+        where: { id: catBreedId },
+      });
+
+      if (!catBreed) {
+        return res.status(404).json({ message: "Cat not found" });
+      }
+
+      if (catBreed.image) {
+        await deleteFile(catBreed.image);
+      }
+
       const deletedCatBreed = await this.catBreedRepostory.delete(catBreedId);
 
-      res.json({ message: "Cat race deleted", data: deletedCatBreed });
+      res.json({ message: "Cat breed deleted", data: deletedCatBreed });
     } catch (error) {
       res.status(500).json({ message: getErrorMessage(error) });
     }
