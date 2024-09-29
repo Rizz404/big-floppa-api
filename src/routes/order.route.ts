@@ -9,7 +9,7 @@ const router = express.Router();
 router.route("/").get(auth, orderController.getOrders);
 router
   .route("/orderItems/:orderId")
-  .patch(auth, orderController.getOrderItemsFromOrderId);
+  .get(auth, orderController.getOrderItemsFromOrderId);
 router
   .route("/:orderId")
   .get(auth, orderController.getOrderById)
